@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Neighborhood Map</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <h1>Neighborhood Map</h1>
+      <div class="">
+        <input id="search-box" class="search-box" type="text" placeholder="search...">
+      </div>
+      <div class="list-view">
+        <input class="filter-box" type="text" data-bind="textInput: filter" placeholder="filter...">
+        <ol class="place_list" data-bind="foreach: filteredMarkers">
+          <li class="place_item">
+            <span data-bind="text: name"></span>
+            <button data-bind="click: $parent.removeMarker" type="button">remove</button>
+          </li>
+        </ol>
+      </div>
+    </div>
+    <div id="map">
+
+    </div>
+  </div>
+
+  <script>
+    var googleMaps = googleMaps || {};
+
+    function initMap(){
+      var options = {
+        center: {lat: 40.706539, lng: -74.019442},
+        zoom: 12,
+        disableDoubleClickZoom: false
+      };
+      googleMaps.map = new google.maps.Map(document.getElementById('map'), options);
+      googleMaps.infowindow = new google.maps.InfoWindow();
+      googleMaps.searchBox = new google.maps.places.SearchBox(document.getElementById('search-box'));
+      googleMaps.Marker = google.maps.Marker;
+    }
+  </script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTASu4wSSGtlOvRn7rBiBxEl4RJr2Yreo&libraries=places&callback=initMap">
+  </script>
+  <script src="libs/jquery-3.2.1.min.js"> </script>
+  <script src="libs/knockout-3.4.2.js"> </script>
+  <script src="js/map.js"> </script>
+  <script src="js/app.js"> </script>
+</body>
+</html>
