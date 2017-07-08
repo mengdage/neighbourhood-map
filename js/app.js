@@ -4,6 +4,8 @@
   var googleMaps,
       ko,
       searchBox,
+      vmInfowindow, // viewmodel
+      vmSidebar,    // viewmodel
       sidebarEle = global.document.querySelector('.sidebar'),
       config = {
         places: [
@@ -44,9 +46,15 @@
   // Store the new marker
   function MMarker(place) {
     // TODO: create observable properties
+    var lat = place.latlng ? place.latlng.lat : place.geometry.location.lat(),
+        lng = place.latlng ? place.latlng.lng : place.geometry.location.lng();
     this.id = ko.observable(place.place_id);
     this.name = ko.observable(place.name);
     this.formatted_address = ko.observable(place.formatted_address);
+    this.location = {
+      lat: ko.observable(lat),
+      lng: ko.observable(lng)
+    };
   }
 
   // Viewmodel for the sidebar
@@ -70,6 +78,7 @@
       }
     });
 
+    // When the filteredMarkers changes, change the markers on the map as well
     self.filteredMarkers.subscribe(function(newFilteredMarkers) {
       var ids = newFilteredMarkers.map(function(marker) {
         return marker.id();
@@ -93,18 +102,20 @@
     // add a new marker from the `place` and push the marker into the markers array
     self.addMarker = function (place) {
       // Only add a new marker if a new place
-      if(self.findMarker(place.place_id) === -1) {
-        console.log(place.name+" "+place.place_id+" added.");
+      var id = place.place_id;
+      if(self.findMarker(id) === -1) {
+        console.log(place.name+" "+id+" added.");
         self.markers.push(new MMarker(place));
-        // TODO: add a new marker on the google map
+        // Add a new marker on the google map
         googleMaps.addMarker(place);
+        googleMaps.addMarkerClickListener(id, function(){markerClickCallback(place);});
       } else {
         console.log(place.name+" "+place.place_id+" already exist.");
       }
     };
 
+    // return the index of marker with `id`
     self.findMarker = function(id) {
-      // self.markers().forEach(function(marker, index) {
       var i, max;
       for(i = 0, max = self.markers().length; i < max; i+=1){
         if(self.markers()[i].id() === id) {
@@ -120,21 +131,59 @@
       self.markers.remove(function(marker) {
         return marker.id() === id;
       });
-      // TODO: remove the marker from the google map markers
+      // Remove the marker from the google map markers
       googleMaps.removeMarker(place.id());
     };
+
+    function markerClickCallback(place) {
+      var id = place.place_id;
+      var contentString = '<div class="infowindow">' +
+                            '<h2 class="info-header" data-bind="text: placeName">' + '</h2>' +
+                            '<p class="info-address">Address: '+'<span data-bind="text: placeAddress">' +'</span>'+'</p>' +
+                            '<div class="info-row">'+
+                              '<ul class="info-btns-list">'+
+                                '<li>'+'<a href="#">' + 'hello' + '</a>'+'</li>'+
+                                '<li>'+'<a href="#">' + 'world' + '</a>'+'</li>'+
+                              '</ul>'+
+                            '</div>'+
+                            '<div data-bind="html: contentString">'+'</div>'+
+                          '</div>';
+
+      googleMaps.setInfowindowContent(contentString);
+      googleMaps.openInfowindow(id);
+      vmInfowindow.setPlace(place);
+      ko.applyBindings(vmInfowindow, document.querySelector('.infowindow'));
+
+    }
   }
 
+  // Viewmodel for the infowindow
+  function VMInfowindow() {
+    this.placeName = ko.observable();
+    this.placeAddress = ko.observable();
+
+    this.contentString = ko.observable('<h3>Hello, I\'m VMInfowindow</h3>');
+    this.setPlace = function(place){
+      this.placeName(place.name);
+      this.placeAddress(place.formatted_address);
+    };
+
+
+  }
 
   function init() {
+
+    var defaultPlaces = config.places;
     // initialization
     googleMaps = global.googleMaps;
     ko = global.ko;
     searchBox = googleMaps.searchBox;
 
     // create the sidebar viewmodel
-    var vmSidebar = new VMSidebar(),
-        defaultPlaces = config.places;
+    vmSidebar = new VMSidebar();
+    vmInfowindow = new VMInfowindow();
+
+
     // add default places
     defaultPlaces.forEach(function(place) {
       vmSidebar.addMarker(place);

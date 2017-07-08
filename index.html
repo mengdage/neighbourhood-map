@@ -39,7 +39,7 @@
         disableDoubleClickZoom: false
       };
       googleMaps.map = new google.maps.Map(document.getElementById('map'), options);
-      googleMaps.infowindow = new google.maps.InfoWindow();
+      googleMaps.infowindow = new google.maps.InfoWindow({maxWidth: 400});
       googleMaps.searchBox = new google.maps.places.SearchBox(document.getElementById('search-box'));
       googleMaps.Marker = google.maps.Marker;
     }

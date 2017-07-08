@@ -33,3 +33,31 @@ body {
   height: 100%;
   width: 70%;
 }
+
+/************** infowindow ************/
+.info-header {
+  text-align: center;
+}
+
+.info-row {
+}
+
+.info-btns-list {
+  overflow: auto;
+  padding: 0;
+  margin: 10px 0;
+  width: 100%;
+}
+
+.info-btns-list > li {
+  float: left;
+  display: block;
+  width: 50%;
+  text-align: center;
+}
+
+.info-btns-list > li >a {
+  display: block;
+  border: 1px solid #000;
+  text-decoration: none;
+}

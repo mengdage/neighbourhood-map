@@ -5,24 +5,35 @@
   googleMaps.markers =[];
   googleMaps.addMarker = addMarker;
   googleMaps.removeMarker = removeMarker;
-  // googleMaps.hideMarker = hideMarker;
-  // googleMaps.showMarker = showMarker;
   googleMaps.showMarkers = showMarkers;
+  googleMaps.addMarkerClickListener = addMarkerClickListener;
+  googleMaps.openInfowindow = openInfowindow;
+  googleMaps.setInfowindowContent = setInfowindowContent;
 
   var ko,
       Marker,
       map,
+      infowindow,
       markers = googleMaps.markers;
 
   global.addEventListener('load', init);
   function init(){
     Marker = googleMaps.Marker;
     map = googleMaps.map;
+    infowindow = googleMaps.infowindow;
+
+    infowindow.addListener('closeclick', function(){
+      infowindow.marker = null;
+    });
   }
 
+  /************ Marker **************/
   // add marker to the array
   function addMarker(place){
     console.log('add Marker ' + place.place_id + " to the map");
+    var contentString = '<div class="infowindow">' +
+                          '<h2>'+place.name+'</h2>' +
+                        '</div>';
     var latlng = place.latlng || place.geometry.location;
     var m = new Marker({
       position: latlng,
@@ -31,6 +42,26 @@
     });
     m.id = place.place_id;
     markers.push(m);
+
+
+    // m.addListener('click', function(){
+    //   if(infowindow.marker === m) {
+    //     return;
+    //   }
+    //   infowindow.marker = m;
+    //
+    //   openInfowindow(m, contentString);
+    // });
+  }
+
+  // add click event listener to the marker with 'markerId'
+  function addMarkerClickListener(markerId, fn) {
+    // Get the marker with `markerId`
+    var marker = findMarkerById(markerId);
+    if(marker === null) {
+      return;
+    }
+    marker.addListener('click', fn);
   }
 
   // remove the marker with id (place_id) from the array
@@ -85,6 +116,32 @@
         }
       });
     }
+  }
+
+  // return the marker with `id`
+  // return null if not find
+  function findMarkerById(id) {
+    var i, max;
+    for(i = 0, max = markers.length; i < max; i+=1) {
+      if(markers[i].id === id) {
+        return markers[i];
+      }
+    }
+    return null;
+  }
+  /************ end of Marker  **************/
+
+  /************ infowindow **************/
+  function openInfowindow(markerId, content) {
+    var marker = findMarkerById(markerId);
+    if(content) {
+      setInfowindowContent(content);
+    }
+
+    infowindow.open(map, marker);
+  }
+  function setInfowindowContent(content) {
+    infowindow.setContent(content);
   }
 
 
