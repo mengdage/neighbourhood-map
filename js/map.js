@@ -22,7 +22,7 @@
 
   // add marker to the array
   function addMarker(place){
-    console.log('add Marker' + place.id);
+    console.log('add Marker ' + place.place_id + " to the map");
     var latlng = place.latlng || place.geometry.location;
     var m = new Marker({
       position: latlng,

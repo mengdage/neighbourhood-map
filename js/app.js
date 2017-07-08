@@ -86,16 +86,32 @@
       }
 
       places.forEach(function(place) {
-        console.log(place.name+" "+place.place_id+" "+place.geometry.location.lat()+" "+place.geometry.location.lng());
         self.addMarker(place);
       });
     });
 
     // add a new marker from the `place` and push the marker into the markers array
     self.addMarker = function (place) {
+      // Only add a new marker if a new place
+      if(self.findMarker(place.place_id) === -1) {
+        console.log(place.name+" "+place.place_id+" added.");
         self.markers.push(new MMarker(place));
         // TODO: add a new marker on the google map
         googleMaps.addMarker(place);
+      } else {
+        console.log(place.name+" "+place.place_id+" already exist.");
+      }
+    };
+
+    self.findMarker = function(id) {
+      // self.markers().forEach(function(marker, index) {
+      var i, max;
+      for(i = 0, max = self.markers().length; i < max; i+=1){
+        if(self.markers()[i].id() === id) {
+          return i;
+        }
+      }
+      return -1;
     };
 
     // remove the marker with the given id
