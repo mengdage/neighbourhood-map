@@ -35,18 +35,15 @@
 
   /************ Marker **************/
   // add marker to the array
-  function addMarker(place){
-    console.log('add Marker ' + place.place_id + " to the map");
-    var contentString = '<div class="infowindow">' +
-                          '<h2>'+place.name+'</h2>' +
-                        '</div>';
-    var latlng = place.latlng || place.geometry.location;
+  function addMarker(marker){
+    console.log('add Marker ' + marker.id() + " to the map");
+
     var m = new Marker({
-      position: latlng,
+      position: {lat: marker.location.lat(), lng: marker.location.lng()},
       map: map,
       animation: google.maps.Animation.DROP
     });
-    m.id = place.place_id;
+    m.id = marker.id();
     markers.push(m);
   }
 

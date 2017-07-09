@@ -7,6 +7,7 @@
       vmInfowindow, // viewmodel
       vmSidebar,    // viewmodel
       sidebarEle = global.document.querySelector('.sidebar'),
+      getInfo,
       config = {
         places: [
           {
@@ -102,14 +103,17 @@
     // add a new marker from the `place` and push the marker into the markers array
     self.addMarker = function (place) {
       // Only add a new marker if a new place
-      var id = place.place_id;
+      var id = place.place_id,
+          marker;
       if(self.findMarker(id) === -1) {
         console.log(place.name+" "+id+" added.");
-        self.markers.push(new MMarker(place));
+        marker = new MMarker(place);
+        self.markers.push(marker);
         // Add a new marker on the google map
-        googleMaps.addMarker(place);
+        // TODO:
+        googleMaps.addMarker(marker);
         googleMaps.addMarkerClickListener(id, function(){
-          markerClickCallback(place);});
+          markerClickCallback(marker);});
       } else {
         console.log(place.name+" "+place.place_id+" already exist.");
       }
@@ -136,15 +140,15 @@
       googleMaps.removeMarker(place.id());
     };
 
-    function markerClickCallback(place) {
-      var id = place.place_id;
+    function markerClickCallback(marker) {
+      var id = marker.id();
       var contentString = '<div class="info-window">' +
                             '<h2 class="info-header" data-bind="text: placeName">' + '</h2>' +
                             '<p class="info-address">Address: '+'<span data-bind="text: placeAddress">' +'</span>'+'</p>' +
                             '<div class="info-row">'+
                               '<ul class="info-btns-list">'+
-                                '<li>'+'<a href="#">' + 'hello' + '</a>'+'</li>'+
-                                '<li>'+'<a href="#">' + 'world' + '</a>'+'</li>'+
+                                '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'flickr\');}">' + 'flickr' + '</a>'+'</li>'+
+                                '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'wiki\')}">' + 'wiki' + '</a>'+'</li>'+
                               '</ul>'+
                             '</div>'+
                             '<div data-bind="html: contentString">'+'</div>'+
@@ -152,7 +156,8 @@
 
       googleMaps.setInfowindowContent(contentString);
       googleMaps.openInfowindow({id: id});
-      vmInfowindow.setPlace(place);
+      vmInfowindow.setPlace(marker);
+
       ko.applyBindings(vmInfowindow, document.querySelector('.info-window'));
 
     }
@@ -160,16 +165,69 @@
 
   // Viewmodel for the infowindow
   function VMInfowindow() {
-    this.placeName = ko.observable();
-    this.placeAddress = ko.observable();
-
-    this.contentString = ko.observable('<h3>Hello, I\'m VMInfowindow</h3>');
-    this.setPlace = function(place){
-      this.placeName(place.name);
-      this.placeAddress(place.formatted_address);
+    var self = this;
+    self.placeName = ko.observable();
+    self.placeAddress = ko.observable();
+    self.infos = ko.observableArray();
+    self.location = {
+      lat: ko.observable(),
+      lng: ko.observable()
     };
 
+    self.contentString = ko.observable('<h3>Hello, I\'m VMInfowindow</h3>');
+    self.setPlace = function(marker){
+      self.placeName(marker.name());
+      self.placeAddress(marker.formatted_address());
+      self.location.lat(marker.location.lat());
+      self.location.lng(marker.location.lng());
+      // clear previous content
+      clearContent();
+    };
 
+    self.getMoreInfo = function(type) {
+      switch(type) {
+        case 'flickr':
+          self.contentString('<div><img class="loading-icon" src="images/flickr-loader.gif" alt="loading"></div>');
+          getInfoService.getFlickrInfo(populateFlickr, {name: self.placeName(),lat:self.location.lat(), lng:self.location.lng()});
+          break;
+        case 'wiki':
+          self.contentString('wiki');
+          break;
+        default:
+          console.log('unknow info type');
+      }
+    };
+
+    function populateFlickr(infos) {
+      var contentString;
+      if(!infos){
+        // request failed
+        contentString = '<p>Error</p>';
+      } else {
+        contentString = infos.map(function(info) {
+          // escape the title to prevent XSS attact
+          var title = escapeHtml(info.title);
+          return '<div class="flickr-item">' +
+                    '<h2 class="flickr-item-header">' + title + '</h2>' +
+                    '<a target="_blank" href="' +info.siteUrl+ '"' + 'title="' + title + '">' +
+                    '<img class="flickr-item-img" src="' + info.sourceUrl + '" alt="' + title + '" >' +
+                    '</a>' +
+                 '</div>';
+        }).join('');
+      }
+      self.contentString(contentString);
+    }
+
+    function clearContent() {
+      self.contentString('<h3>Hello, I\'m VMInfowindow</h3>');
+    }
+
+  }
+
+  function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
   }
 
   function init() {
@@ -179,6 +237,7 @@
     googleMaps = global.googleMaps;
     ko = global.ko;
     searchBox = googleMaps.searchBox;
+    getInfoService = global.getInfoService;
 
     // create the sidebar viewmodel
     vmSidebar = new VMSidebar();

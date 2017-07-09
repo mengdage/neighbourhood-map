@@ -1,14 +1,15 @@
 (function(global) {
   'use strict';
 
-  global.getInfo = {
-    flickrInfo: flickrInfo
+  global.getInfoService = {
+    getFlickrInfo: getFlickrInfo
   };
 
   // place: {lat: 123, lng: 123}
-  function flickrInfo(callback, place) {
+  function getFlickrInfo(callback, place) {
     var endpoint = 'https://api.flickr.com/services/rest/',
-        photoSourceUrl = 'https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}_m.jpg';
+        photoSourceUrl = 'https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}_m.jpg', // url to the photo
+        photoUrl = 'https://www.flickr.com/photos/{user-id}/{photo-id}'; // url to the photo on flickr
 
     // check callback is a function
     if(typeof callback !== 'function') {
@@ -21,7 +22,7 @@
       console.warn('Insufficient information. Make sure pass in a object with lat and lng as the second param');
       return;
     }
-
+    var infos = null;
     $.get({
       url: endpoint,
       data:{
@@ -30,6 +31,7 @@
         format: 'json',
         content_type: 1,
         radius: 5,
+        text: place.name,
         lat: place.lat,
         lon: place.lng,
         nojsoncallback: 1,
@@ -43,12 +45,14 @@
         var content,
             photos, // the photos array return from Flickr search api
             sourceUrl, // photo source url for one photo
+            siteUrl, // url to the photo on Flick
             // params needed to construct a source URL to a photo
             farmId,
             serverId,
             id,
-            secret,
-            infos = [];
+            owner,
+            secret;
+        infos = [];
         if(!data.photos) {
           content = '<p>not found!</p>';
         } else {
@@ -57,20 +61,28 @@
             farmId = photo.farm;
             serverId = photo.server;
             id = photo.id;
-            secret = photo.secret;
+            secret = photo.secret,
+            owner = photo.owner;
             // construct a valid source URL to a photo
             // https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}_m.jpg
             sourceUrl = photoSourceUrl.replace('{farm-id}', farmId)
                                       .replace('{server-id}', serverId)
                                       .replace('{id}', id)
                                       .replace('{secret}', secret);
+            // Construct a url to a photo on flickr
+            // https://www.flickr.com/photos/{user-id}/{photo-id}
+            siteUrl = photoUrl.replace('{user-id}', owner)
+                              .replace('{photo-id}', id);
 
             infos.push({
               title: photo.title,
-              sourceUrl: sourceUrl
+              sourceUrl: sourceUrl,
+              siteUrl: siteUrl
             });
           });
         }
+      })
+      .always(function(){
         callback(infos);
       });
   }
