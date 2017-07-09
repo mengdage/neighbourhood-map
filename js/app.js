@@ -108,7 +108,8 @@
         self.markers.push(new MMarker(place));
         // Add a new marker on the google map
         googleMaps.addMarker(place);
-        googleMaps.addMarkerClickListener(id, function(){markerClickCallback(place);});
+        googleMaps.addMarkerClickListener(id, function(){
+          markerClickCallback(place);});
       } else {
         console.log(place.name+" "+place.place_id+" already exist.");
       }
@@ -137,7 +138,7 @@
 
     function markerClickCallback(place) {
       var id = place.place_id;
-      var contentString = '<div class="infowindow">' +
+      var contentString = '<div class="info-window">' +
                             '<h2 class="info-header" data-bind="text: placeName">' + '</h2>' +
                             '<p class="info-address">Address: '+'<span data-bind="text: placeAddress">' +'</span>'+'</p>' +
                             '<div class="info-row">'+
@@ -150,9 +151,9 @@
                           '</div>';
 
       googleMaps.setInfowindowContent(contentString);
-      googleMaps.openInfowindow(id);
+      googleMaps.openInfowindow({id: id});
       vmInfowindow.setPlace(place);
-      ko.applyBindings(vmInfowindow, document.querySelector('.infowindow'));
+      ko.applyBindings(vmInfowindow, document.querySelector('.info-window'));
 
     }
   }
@@ -188,6 +189,8 @@
     defaultPlaces.forEach(function(place) {
       vmSidebar.addMarker(place);
     });
+
+    // add click event listener to googleMap
 
     ko.applyBindings(vmSidebar, sidebarEle);
   }

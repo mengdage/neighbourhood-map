@@ -22,8 +22,14 @@
     map = googleMaps.map;
     infowindow = googleMaps.infowindow;
 
+    // when the infowindow is close, clear the associated marker
     infowindow.addListener('closeclick', function(){
       infowindow.marker = null;
+    });
+
+    // when map is clicked, close the infowindow if it is open
+    map.addListener('click', function(){
+      infowindow.close();
     });
   }
 
@@ -42,16 +48,6 @@
     });
     m.id = place.place_id;
     markers.push(m);
-
-
-    // m.addListener('click', function(){
-    //   if(infowindow.marker === m) {
-    //     return;
-    //   }
-    //   infowindow.marker = m;
-    //
-    //   openInfowindow(m, contentString);
-    // });
   }
 
   // add click event listener to the marker with 'markerId'
@@ -132,9 +128,15 @@
   /************ end of Marker  **************/
 
   /************ infowindow **************/
-  function openInfowindow(markerId, content) {
-    var marker = findMarkerById(markerId);
-    if(content) {
+  // options must contain marker or id
+  function openInfowindow(options) {
+    var marker;
+    if(options.id){
+      marker = findMarkerById(options.id);
+    } else {
+      marker = options.marker;
+    }
+    if(options.content) {
       setInfowindowContent(content);
     }
 
