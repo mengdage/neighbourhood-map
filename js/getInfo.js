@@ -2,7 +2,8 @@
   'use strict';
 
   global.getInfoService = {
-    getFlickrInfo: getFlickrInfo
+    getFlickrInfo: getFlickrInfo,
+    getWikiInfo: getWikiInfo
   };
 
   // place: {lat: 123, lng: 123}
@@ -87,4 +88,54 @@
       });
   }
 
+  //
+  function getWikiInfo(callback, place) {
+    // check callback is a function
+    if(typeof callback !== 'function') {
+      console.warn('callback is not a function');
+      return;
+    }
+    var endPoint = 'https://en.wikipedia.org/w/api.php',
+        results = null;
+
+    $.ajax({
+      url: endPoint,
+      dataType: 'jsonp',
+      data: {
+        action: 'query',
+        format: 'json',
+        prop: 'coordinates|pageimages|pageterms|info',
+        generator: 'geosearch',
+        formatversion: 2,
+        colimit: 5,
+        piprop: 'thumbnail',
+        pithumbsize: 144,
+        pilimit: 5,
+        wbptterms: 'description',
+        inprop: 'url',
+        ggscoord: place.lat+'|'+place.lng,
+        ggsradius: 10000,
+        ggslimit: 5
+      }
+    })
+    .done(function(data) {
+      if(data.query && data.query.pages) {
+        results = data.query.pages
+                  .map(function(page) {
+                    return {
+                      siteUrl: page.fullurl,
+                      coordinates: page.coordinates,
+                      lang: page.pagelanguage,
+                      thumbnail: page.thumbnail,
+                      title: page.title,
+                      description: page.terms ? page.terms.description : undefined
+                    };
+                  });
+
+      }
+    })
+    .always(function() {
+      callback(results);
+    });
+  }
 })(self);

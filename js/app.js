@@ -191,7 +191,8 @@
           getInfoService.getFlickrInfo(populateFlickr, {name: self.placeName(),lat:self.location.lat(), lng:self.location.lng()});
           break;
         case 'wiki':
-          self.contentString('wiki');
+          self.contentString('<div><img class="loading-icon" src="images/flickr-loader.gif" alt="loading"></div>');
+          getInfoService.getWikiInfo(populateWiki, {lat:self.location.lat(), lng:self.location.lng()});
           break;
         default:
           console.log('unknow info type');
@@ -202,7 +203,7 @@
       var contentString;
       if(!infos){
         // request failed
-        contentString = '<p>Error</p>';
+        contentString = '<p>Something bad happended.</p>';
       } else {
         contentString = infos.map(function(info) {
           // escape the title to prevent XSS attact
@@ -218,6 +219,39 @@
       self.contentString(contentString);
     }
 
+    function populateWiki(infos) {
+      console.log(infos);
+      var contentString;
+      if(!infos){
+        // request failed
+        contentString = '<p>Something bad happended.</p>';
+      } else {
+        contentString = infos.map(function(info) {
+          // escape the title to prevent XSS attact
+          var title = escapeHtml(info.title),
+              description = escapeHtml(info.description);
+          return '<div class="wiki-item">' +
+                    '<h2 class="wiki-item-header">' +
+
+                    (info.siteUrl ?
+                      '<a target="_blank" href="' +info.siteUrl+ '"' + 'title="' + title + '">' +
+                      title + '</a>' : title
+                    ) +
+
+                    '</h2>' +
+
+                    (info.thumbnail ?
+                    '<img class="flickr-item-img" src="' + info.thumbnail.source + '" alt="' + title + '" >' : ''
+                    ) +
+
+                    (info.description ?
+                    '<p>' + description + '</p>' : ''
+                    ) +
+                 '</div>';
+        }).join('');
+      }
+      self.contentString(contentString);
+    }
     function clearContent() {
       self.contentString('<h3>Hello, I\'m VMInfowindow</h3>');
     }
