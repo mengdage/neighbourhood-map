@@ -21,7 +21,7 @@
         <ol class="place_list" data-bind="foreach: filteredMarkers">
           <li class="place_item">
             <span data-bind="text: name"></span>
-            <button data-bind="click: $parent.removeMarker" type="button">remove</button>
+            <a data-bind="click: $parent.removeMarker" >remove</a>
           </li>
         </ol>
       </div>
@@ -37,13 +37,14 @@
     function initMap(){
       var options = {
         center: {lat: 40.706539, lng: -74.019442},
-        zoom: 12,
+        zoom: 13,
         disableDoubleClickZoom: false
       };
       googleMaps.map = new google.maps.Map(document.getElementById('map'), options);
       googleMaps.infowindow = new google.maps.InfoWindow({maxWidth: 400});
       googleMaps.searchBox = new google.maps.places.SearchBox(document.getElementById('search-box'));
       googleMaps.Marker = google.maps.Marker;
+      googleMaps.LatLngBounds = google.maps.LatLngBounds;
     }
   </script>
   <script async defer

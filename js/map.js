@@ -12,15 +12,19 @@
 
   var ko,
       Marker,
+      LatLngBounds,
       map,
       infowindow,
-      markers = googleMaps.markers;
+      markers = googleMaps.markers,
+      bounds;
 
   global.addEventListener('load', init);
   function init(){
     Marker = googleMaps.Marker;
+    LatLngBounds = googleMaps.LatLngBounds;
     map = googleMaps.map;
     infowindow = googleMaps.infowindow;
+    bounds = new LatLngBounds();
 
     // when the infowindow is close, clear the associated marker
     infowindow.addListener('closeclick', function(){
@@ -32,6 +36,16 @@
       infowindow.close();
     });
   }
+  /************ Map  **************/
+
+  // center the map to the given marker
+  function setCenter(marker) {
+    map.panTo(marker.getPosition());
+  }
+
+  // function 
+
+  /************ end of Map  **************/
 
   /************ Marker **************/
   // add marker to the array
@@ -45,6 +59,9 @@
     });
     m.id = marker.id();
     markers.push(m);
+
+    // Center the map to the new marker
+    setCenter(m);
   }
 
   // add click event listener to the marker with 'markerId'
@@ -142,6 +159,7 @@
   function setInfowindowContent(content) {
     infowindow.setContent(content);
   }
+  /************ end of infowindow **************/
 
 
 })(self);
