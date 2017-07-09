@@ -17,6 +17,7 @@ body {
   padding: 10px;
   height: 100%;
   width: 30%;
+  overflow: auto;
 }
 
 .search-box {
