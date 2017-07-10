@@ -2,6 +2,7 @@
   'use strict';
 
   var googleMaps,
+      window = global.window,
       ko,
       searchBox,
       searchBoxElem = global.document.querySelector('#search-box'),
@@ -67,15 +68,31 @@
     // The filter keyword
     self.filter = ko.observable('');
 
+    self.largeWindow = ko.observable();
+
     self.expanded = ko.observable(true);
 
+    // cause to toogle expended class on sidebar
     self.toggleSidebar = function(){
       self.expanded(!self.expanded());
     };
 
+    self.checkIfLargeWindow = function() {
+      if(window.innerWidth > 767) {
+        self.largeWindow(true);
+        console.log('large window');
+      } else {
+        self.largeWindow(false);
+        console.log('small window');
+      }
+    };
+
+    // call googleMaps to center the map to the place
     self.centerMarker = function(place) {
       var id = place.id();
-
+      if(!self.largeWindow()) {
+        self.toggleSidebar();
+      }
       googleMaps.setCenter({id: id});
     };
 
@@ -102,8 +119,12 @@
 
     // add listener to places_changed event to get the search result
     searchBox.addListener('places_changed', function() {
-      // debugger;
+      // Clean searchBox
       searchBoxElem.value = '';
+      // Check if small window. If so, close the sidebar
+      if(!self.largeWindow()) {
+        self.toggleSidebar();
+      }
       var places = searchBox.getPlaces();
       if( places.length === 0) {
         return;
@@ -175,6 +196,8 @@
       ko.applyBindings(vmInfowindow, document.querySelector('.info-window'));
 
     }
+
+    window.addEventListener('resize', self.checkIfLargeWindow);
   }
 
   // Viewmodel for the infowindow
@@ -289,6 +312,9 @@
 
     // create the sidebar viewmodel
     vmSidebar = new VMSidebar();
+    vmSidebar.checkIfLargeWindow();
+
+    // create the infowindow viewmodel
     vmInfowindow = new VMInfowindow();
 
 
