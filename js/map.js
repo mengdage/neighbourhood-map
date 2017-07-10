@@ -10,6 +10,8 @@
   googleMaps.openInfowindow = openInfowindow;
   googleMaps.setInfowindowContent = setInfowindowContent;
   googleMaps.setCenter = setCenter;
+  googleMaps.bounceMarker = bounceMarker;
+  googleMaps.triggerMarkerClick = triggerMarkerClick;
 
   var ko,
       Marker,
@@ -32,10 +34,15 @@
       infowindow.marker = null;
     });
 
+    // style the infowindow when the dom is ready
+    infowindow.addListener('domready', styleInfowindow);
+
     // when map is clicked, close the infowindow if it is open
     map.addListener('click', function(){
       infowindow.close();
     });
+
+
 
     // map.addListener('bounds_changed', centerMap);
   }
@@ -49,24 +56,33 @@
     } else if(option.id) {
       marker = findMarkerById(option.id);
     }
+    // if marker exists, center map to the marker
     if(marker) {
       console.log('center map to ' + marker.getPosition());
       map.panTo(marker.getPosition());
-      bounceMarker(marker);
+      // bounceMarker({marker: marker});
     }
 
   }
 
   // bounce the marker for 1second
-  function bounceMarker(marker) {
-    var duration = 1.4;  // Seconds.
+  // options {id: id, marker: marker}
+  function bounceMarker(options) {
+    var marker,
+        duration = 1.4;  // Seconds.
+    if(options.id) {
+      marker = findMarkerById(options.id);
+    } else if(options.marker){
+      marker = options.marker;
+    }
 
-    marker.setAnimation(google.maps.Animation.BOUNCE);
-
-    window.setTimeout(end, duration * 1000);
-
-    function end() {
-      marker.setAnimation(null);
+    // if marker exists, bounce the marker
+    if(marker) {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      window.setTimeout(end, duration * 1000);
+      function end() {
+        marker.setAnimation(null);
+      }
     }
   }
 
@@ -173,6 +189,13 @@
     }
     return null;
   }
+
+  function triggerMarkerClick(id) {
+    var marker = findMarkerById(id);
+    if(marker){
+      googleMaps.triggerEvent(marker, 'click');
+    }
+  }
   /************ end of Marker  **************/
 
   /************ infowindow **************/
@@ -192,6 +215,64 @@
   }
   function setInfowindowContent(content) {
     infowindow.setContent(content);
+  }
+
+  // *
+  // START INFOWINDOW CUSTOMIZE.
+  // From Miguel Marnoto's codepen
+  // https://codepen.io/Marnoto/pen/xboPmG
+  // *
+  function styleInfowindow() {
+    // Reference to the DIV that wraps the bottom of infowindow
+    var iwOuter = $('.gm-style-iw');
+
+    /* Since this div is in a position prior to .gm-div style-iw.
+     * We use jQuery and create a iwBackground variable,
+     * and took advantage of the existing reference .gm-style-iw for the previous div with .prev().
+    */
+    var iwBackground  = iwOuter.prev(),
+        iwArrowShadow = iwBackground.children(':nth-child(1)'),
+        iwBgShadow    = iwBackground.children(':nth-child(2)'),
+        iwArrow       = iwBackground.children(':nth-child(3)'),
+        iwBgContent   = iwBackground.children(':nth-child(4)'),
+        iwCloseBtn    = iwOuter.next(); //div that groups the close button elements.
+
+    // Removes background shadow DIV
+    iwBgShadow.css({'display' : 'none'});
+
+    // Removes white background DIV
+    iwBgContent.css({'display' : 'none'});
+
+    // // Moves the infowindow.
+    // iwOuter.parent().parent().css({left: '100px'});
+    // // Moves the arrow.
+    // iwArrowShadow.attr('style', function(i,s){ return s + 'left: 36px !important;'});
+    // iwArrow.attr('style', function(i,s){ return s + 'left: 36px !important;'});
+
+    // Changes the desired tail shadow color.
+    iwArrow.find('div').children()
+           .css({'box-shadow': 'rgba(72, 181, 233, 0.6) 0px 1px 6px', 'z-index' : '1'});
+
+    // Apply the desired effect to the close button
+    iwCloseBtn.css({
+      'width': '20px',
+      'height': '20px',
+      'opacity': '1',
+      'right': '44px',
+      'top': '8px',
+      'border': '4px solid #48b5e9',
+      'border-radius': '13px',
+      'box-shadow': '0 0 5px #3990B9'});
+
+    // If the content of infowindow not exceed the set maximum height, then the gradient is removed.
+    if($('.iw-content').height() < 140){
+      $('.iw-bottom-gradient').css({display: 'none'});
+    }
+
+    // The API automatically applies 0.7 opacity to the button after the mouseout event. This function reverses this event to the desired value.
+    iwCloseBtn.mouseout(function(){
+      $(this).css({opacity: '1'});
+    });
   }
   /************ end of infowindow **************/
 

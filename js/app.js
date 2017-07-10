@@ -88,12 +88,13 @@
     };
 
     // call googleMaps to center the map to the place
-    self.centerMarker = function(place) {
+    self.listItemClicked = function(place) {
       var id = place.id();
       if(!self.largeWindow()) {
         self.toggleSidebar();
       }
       googleMaps.setCenter({id: id});
+      googleMaps.triggerMarkerClick(id);
     };
 
     // The result marker array filtered by `filter`
@@ -178,21 +179,28 @@
     function markerClickCallback(marker) {
       var id = marker.id();
       var contentString = '<div class="info-window">' +
-                            '<h2 class="info-header" data-bind="text: placeName">' + '</h2>' +
-                            '<p class="info-address">Address: '+'<span data-bind="text: placeAddress">' +'</span>'+'</p>' +
-                            '<div class="info-row">'+
-                              '<ul class="info-btns-list">'+
-                                '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'flickr\');}">' + 'flickr' + '</a>'+'</li>'+
-                                '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'wiki\')}">' + 'wiki' + '</a>'+'</li>'+
-                              '</ul>'+
-                            '</div>'+
+                            '<div class="info-header">' +
+                              '<h2 class="info-title" data-bind="text: placeName">' + '</h2>' +
+                              '<div class="info-address-container">'+'<div class="info-address" data-bind="text: placeAddress">' +'</div>'+'</div>' +
+                              '<div class="info-nav">'+
+                                '<ul class="info-btns-list">'+
+                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'google\');}">' + 'google' + '</a>'+'</li>'+
+                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'flickr\');}">' + 'flickr' + '</a>'+'</li>'+
+                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'wiki\')}">' + 'wiki' + '</a>'+'</li>'+
+                                '</ul>'+
+                              '</div>'+
+                            '</div>' +
+
                             '<div data-bind="html: contentString">'+'</div>'+
                           '</div>';
 
+      // bounce marker
+      googleMaps.bounceMarker({id: id});
+      // populate infowindow
       googleMaps.setInfowindowContent(contentString);
       googleMaps.openInfowindow({id: id});
+      // bind infowindow viewmodel to the infowindow
       vmInfowindow.setPlace(marker);
-
       ko.applyBindings(vmInfowindow, document.querySelector('.info-window'));
 
     }
@@ -246,7 +254,7 @@
           // escape the title to prevent XSS attact
           var title = escapeHtml(info.title);
           return '<div class="flickr-item">' +
-                    '<h2 class="flickr-item-header">' + title + '</h2>' +
+                    '<h3 class="flickr-item-header">' + title + '</h3>' +
                     '<a target="_blank" href="' +info.siteUrl+ '"' + 'title="' + title + '">' +
                     '<img class="flickr-item-img" src="' + info.sourceUrl + '" alt="' + title + '" >' +
                     '</a>' +
