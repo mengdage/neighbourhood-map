@@ -9,6 +9,7 @@
   googleMaps.addMarkerClickListener = addMarkerClickListener;
   googleMaps.openInfowindow = openInfowindow;
   googleMaps.setInfowindowContent = setInfowindowContent;
+  googleMaps.setCenter = setCenter;
 
   var ko,
       Marker,
@@ -41,9 +42,20 @@
   /************ Map  **************/
 
   // center the map to the given marker
-  function setCenter(marker) {
-    map.panTo(marker.getPosition());
+  function setCenter(option) {
+    var marker;
+    if(option.marker) {
+      marker = option.marker;
+    } else if(option.id) {
+      marker = findMarkerById(option.id);
+    }
+    if(marker) {
+      console.log('center map to ' + marker.getPosition());
+      map.panTo(marker.getPosition());
+    }
+
   }
+
 
   function centerMap() {
     console.log('recenter the map');
@@ -70,7 +82,7 @@
     markers.push(m);
 
     // Center the map to the new marker
-    setCenter(m);
+    setCenter({marker: m});
   }
 
   // add click event listener to the marker with 'markerId'

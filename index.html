@@ -28,7 +28,7 @@
           <div class="list-view">
             <ol class="place-list" data-bind="foreach: filteredMarkers">
               <li class="place-item">
-                <span class="place-item-name" data-bind="text: name"></span>
+                <a class="place-item-name" data-bind="text: name, click: $parent.centerMarker"></a>
                 <a class="place-item-remove" data-bind="click: $parent.removeMarker" >
                 </a>
               </li>

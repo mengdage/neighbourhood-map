@@ -72,6 +72,12 @@
       self.expanded(!self.expanded());
     };
 
+    self.centerMarker = function(place) {
+      var id = place.id();
+      
+      googleMaps.setCenter({id: id});
+    };
+
     // The result marker array filtered by `filter`
     self.filteredMarkers = ko.computed(function(){
       if(!self.filter()){
