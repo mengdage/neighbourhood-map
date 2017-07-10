@@ -66,6 +66,12 @@
     // The filter keyword
     self.filter = ko.observable('');
 
+    self.expanded = ko.observable(true);
+
+    self.toggleSidebar = function(){
+      self.expanded(!self.expanded());
+    };
+
     // The result marker array filtered by `filter`
     self.filteredMarkers = ko.computed(function(){
       if(!self.filter()){

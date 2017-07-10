@@ -24,7 +24,7 @@
     LatLngBounds = googleMaps.LatLngBounds;
     map = googleMaps.map;
     infowindow = googleMaps.infowindow;
-    bounds = new LatLngBounds();
+    // bounds = new LatLngBounds();
 
     // when the infowindow is close, clear the associated marker
     infowindow.addListener('closeclick', function(){
@@ -35,6 +35,8 @@
     map.addListener('click', function(){
       infowindow.close();
     });
+
+    // map.addListener('bounds_changed', centerMap);
   }
   /************ Map  **************/
 
@@ -43,7 +45,14 @@
     map.panTo(marker.getPosition());
   }
 
-  // function 
+  function centerMap() {
+    console.log('recenter the map');
+    var bounds = new LatLngBounds();
+    markers.forEach(function(marker) {
+      bounds.extend(marker.getPosition());
+    });
+    map.fitBounds(bounds);
+  }
 
   /************ end of Map  **************/
 

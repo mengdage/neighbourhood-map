@@ -6,34 +6,142 @@ body {
   padding: 0;
   margin: 0;
   height: 100%;
+  font-size: 16px;
+  font-family: 'Roboto Condensed', sans-serif;
 }
 
 .container {
   height: 100%;
   display: flex;
+  overflow: hidden;
 }
 
+/************** sidebar ************/
 .sidebar {
+  background: #2e3d49;
+  position: relative;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  /*overflow: visible;*/
+  z-index: 10;
+  transition: width 0.2s ease-in-out;
+}
+
+.sidebar-header {
+  color: #f3f3f3;
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+.sidebar-content {
+  overflow: hidden;
+
+}
+
+.sidebar-container {
   padding: 10px;
-  height: 100%;
-  width: 30%;
-  overflow: auto;
+  width: 18rem;
 }
 
-.search-box {
-  width: 90%;
-  margin: 0 10px;
+.expanded {
+  width: 18rem;
 }
 
-.filter-box {
-  width: 90%;
-  margin: 0 10px;
+.btn-toggle {
+  position: absolute;
+  right: -1.9em;
+  top: 4px;
+  display: block;
+}
+.btn-toggle::after {
+  content: '\f0c9';
+  font-family: FontAwesome;
+  font-size: 1.5em;
+  background: #2e3d49;
+  padding: 5px;
+  color: #f3f3f3;
 }
 
+.search-view {
+  display: flex;
+  margin: 0 0 10px 0;
+}
+
+.search-view::before {
+  content: '\f002';
+  font-family: FontAwesome;
+  font-size: 1.2em;
+  color: #f3f3f3;
+  width: 1.2em;
+  display: inline-block;
+  padding: 4px 0 0 0;
+}
+
+.contracted {
+  /*transform: translate(300px, -10px);*/
+  display: fixed;
+}
+.input-box {
+  width: 100%;
+}
+
+.filter-view {
+  display: flex;
+  margin: 0 0 10px 0;
+}
+.filter-view::before {
+  content: '\f0b0';
+  font-family: FontAwesome;
+  font-size: 1.2em;
+  color: #f3f3f3;
+  display: inline-block;
+  width: 1.2em;
+  padding: 4px 0 0 0;
+}
+
+.list-view {
+  margin: 0;
+  color: #f3f3f3;
+  /*overflow-y: scroll;*/
+}
+
+.place-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  overflow: scroll;
+}
+
+.place-item {
+  padding: 10px 0;
+}
+
+.place-item:hover {
+  color: #02b3e4;
+}
+
+.place-item-remove {
+  float: right;
+  /*display: inline-block;*/
+}
+.place-item-remove::before {
+  content: '\f014';
+  font-size: 1.2em;
+  font-family: FontAwesome;
+}
+
+/************** end of sidebar ************/
+
+/************** map view ************/
+.map-container {
+  width: 100%;
+}
 #map {
   height: 100%;
-  width: 70%;
 }
+/************** end of map view ************/
 
 /************** infowindow ************/
 .info-window {
@@ -84,4 +192,15 @@ body {
   max-width: 350px;
   display: block;
   margin: 0 auto;
+}
+/************** end of infowindow ************/
+
+@media (max-width: 767px) {
+  .sidebar {
+    position: absolute;
+  }
+}
+
+@media (min-width: 768px) {
+
 }
