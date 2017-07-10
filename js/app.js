@@ -4,6 +4,7 @@
   var googleMaps,
       ko,
       searchBox,
+      searchBoxElem = global.document.querySelector('#search-box'),
       vmInfowindow, // viewmodel
       vmSidebar,    // viewmodel
       sidebarEle = global.document.querySelector('.sidebar'),
@@ -74,7 +75,7 @@
 
     self.centerMarker = function(place) {
       var id = place.id();
-      
+
       googleMaps.setCenter({id: id});
     };
 
@@ -102,6 +103,7 @@
     // add listener to places_changed event to get the search result
     searchBox.addListener('places_changed', function() {
       // debugger;
+      searchBoxElem.value = '';
       var places = searchBox.getPlaces();
       if( places.length === 0) {
         return;

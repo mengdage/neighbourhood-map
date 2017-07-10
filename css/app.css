@@ -115,21 +115,32 @@ body {
 }
 
 .place-item {
-  padding: 10px 0;
+  padding: 0;
+  margin-bottom: 5px;
 }
 
-.place-item:hover {
-  color: #02b3e4;
+.place-item-name {
+  display: inline-block;
+  padding: 5px 0;
+  width: 88%
 }
 
 .place-item-remove {
-  float: right;
-  /*display: inline-block;*/
+  display: inline-block;
+  padding: 5px 0;
+  width: 10%;
+  text-align: right;
+  border-left: 1px solid #3a4b59;
 }
+
 .place-item-remove::before {
   content: '\f014';
   font-size: 1.2em;
   font-family: FontAwesome;
+}
+
+.place-item-name:hover, .place-item-remove:hover {
+  color: #02b3e4;
 }
 
 /************** end of sidebar ************/
@@ -148,8 +159,8 @@ body {
 .info-window {
   border: 1px solid #000;
   padding: 10px;
-  width: 380px;
-  height: 400px;
+  width: 15rem;
+  height: 25rem;
   overflow: auto;
 }
 
@@ -190,7 +201,7 @@ body {
 }
 
 .flickr-item-img {
-  max-width: 350px;
+  max-width: 18rem;
   display: block;
   margin: 0 auto;
 }

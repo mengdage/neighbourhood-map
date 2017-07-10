@@ -52,10 +52,23 @@
     if(marker) {
       console.log('center map to ' + marker.getPosition());
       map.panTo(marker.getPosition());
+      bounceMarker(marker);
     }
 
   }
 
+  // bounce the marker for 1second
+  function bounceMarker(marker) {
+    var duration = 1.4;  // Seconds.
+
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+
+    window.setTimeout(end, duration * 1000);
+
+    function end() {
+      marker.setAnimation(null);
+    }
+  }
 
   function centerMap() {
     console.log('recenter the map');
