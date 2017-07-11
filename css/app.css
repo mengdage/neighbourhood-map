@@ -24,7 +24,6 @@ body {
   bottom: 0;
   left: 0;
   width: 0;
-  /*overflow: visible;*/
   z-index: 10;
   transition: width 0.2s ease-in-out;
 }
@@ -37,7 +36,6 @@ body {
 
 .sidebar-content {
   overflow: hidden;
-
 }
 
 .sidebar-container {
@@ -55,6 +53,7 @@ body {
   top: 4px;
   display: block;
 }
+
 .btn-toggle::after {
   content: '\f0c9';
   font-family: FontAwesome;
@@ -85,6 +84,10 @@ body {
 }
 .input-box {
   width: 100%;
+}
+
+.list-view {
+  overflow: auto;
 }
 
 .filter-view {
@@ -157,16 +160,17 @@ body {
 
 /************** infowindow ************/
 .info-window {
-  /*padding: 5px;*/
+  display: flex;
+  flex-flow: column nowrap;
   width: 15rem;
   height: 25rem;
   overflow: scroll;
 }
 
 .info-header {
-  background-color: #48b5e9;
+  /*background-color: #48b5e9;*/
   padding: 5px 5px 0 5px;
-  color: #fff;
+  /*color: #fff;*/
 }
 
 .info-title {
@@ -175,42 +179,13 @@ body {
 
 }
 
-.info-address-container {
-  font-size: 0.9em;
-  margin: 0;
-  padding: 5px;
-}
-
-.info-address-container::before {
-  content: '\f041 ';
-  font-family: FontAwesome;
-  font-size: 1.2em;
-  float: left;
-  display: block;
-  padding: 0 5px 0 0;
-  width: 10%;
-  box-sizing: border-box;
-}
-
-.info-address-container::after {
-  content: '';
-  display: block;
-  clear: both;
-}
-
-.info-address {
-  float: left;
-  width: 90%;
-}
-
 .info-nav {
-  color: #fff;
+  /*color: #fff;*/
 }
 
 .info-btns-list {
   overflow: auto;
   padding: 0;
-  margin: 0 -6px;
 }
 
 .info-btns-list > li {
@@ -222,24 +197,32 @@ body {
 
 .info-btns-list > li >a {
   display: block;
-  border: 1px solid #fff;
+  border: 1px solid #000;
   padding: 5px 0;
   text-decoration: none;
-  color: #fff;
+  color: #000;
   font-weight: bold;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .info-btns-list > li >a:hover {
-  color: #000;
-  background: #fff;
+  color: #fff;
+  background: #48b5e9;
+}
+
+.active {
+  color: #fff;
+  background: #48b5e9;
 }
 
 .info-btns-list > li + li {
   margin-left: -1px;
 }
 
+.info-content {
+  overflow: auto;
+}
 .loading-icon {
   display: block;
   margin: 10px auto;
@@ -247,7 +230,7 @@ body {
 
 .flickr-item {
   padding: 5px 0;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid #9b9b9b;
 }
 
 .flickr-item-header {
@@ -262,61 +245,68 @@ body {
   margin: 0 auto;
 }
 
-.gm-style-iw {
-  width: 15rem !important;
-  height: 25rem !important;
-	top: 15px !important;
-	left: 0px !important;
-	background-color: #fff;
-	box-shadow: 0 1px 6px rgba(178, 178, 178, 0.6);
-	border: 1px solid rgba(72, 181, 233, 0.6);
-	border-radius: 2px 2px 10px 10px;
+.google-info-line {
+  display: flex;
+  padding: 5px 0;
+  margin: 0 5px;
+  font-size: 1.1em;
 }
 
-.
+.google-info-icon {
+  width: 20px;
+  margin-right: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
-#iw-container {
-	margin-bottom: 10px;
+.google-info-text {
+
 }
-#iw-container .iw-title {
-	font-family: 'Open Sans Condensed', sans-serif;
-	font-size: 22px;
-	font-weight: 400;
-	padding: 10px;
-	background-color: #48b5e9;
-	color: white;
-	margin: 0;
-	border-radius: 2px 2px 0 0;
+
+.google-info-photo {
+  margin: 0 auto;
+  display: block;
 }
-#iw-container .iw-content {
-	font-size: 13px;
-	line-height: 18px;
-	font-weight: 400;
-	margin-right: 1px;
-	padding: 15px 5px 20px 15px;
-	max-height: 140px;
-	overflow-y: auto;
-	overflow-x: hidden;
+
+.wiki-item {
+  padding: 5px 0;
+  border-bottom: 1px solid #9b9b9b;
 }
-.iw-content img {
-	float: right;
-	margin: 0 5px 5px 10px;
+
+.wiki-item-header {
+  margin: 0 0 5px 0;
+  text-align: center;
 }
-.iw-subTitle {
-	font-size: 16px;
-	font-weight: 700;
-	padding: 5px 0;
+
+.wiki-item-header, .wiki-item-header a {
+  text-decoration: none;
+  color: #000;
 }
-.iw-bottom-gradient {
-	position: absolute;
-	width: 326px;
-	height: 25px;
-	bottom: 10px;
-	right: 18px;
-	background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
-	background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
-	background: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
-	background: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+.wiki-item-header::after {
+  content: ' \f08e';
+  font-family: FontAwesome;
+}
+
+.wiki-item-img {
+  max-width: 13rem !important;
+  display: block;
+  margin: 0 auto;
+}
+
+.wiki-item-description {
+
+}
+
+.additional-info-credit {
+  font-size: 0.8em;
+}
+
+.ajax-error {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.2em;
+  color: #f00;
 }
 /************** end of infowindow ************/
 

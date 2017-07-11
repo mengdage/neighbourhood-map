@@ -19,6 +19,12 @@
             latlng: {lat: 40.758895, lng: -73.985131}
           },
           {
+            place_id: 'ChIJL7WWqfhYwokRrQkOaP3SOa4',
+            name: 'Sake Bar Hagi',
+            formatted_address: '152 W 49th St, New York, NY 10019, USA',
+            latlng: {lat: 40.7586101, lng: -73.9782093}
+          },
+          {
             place_id: 'ChIJKxDbe_lYwokRVf__s8CPn-o',
             name: 'The Museum of Modern Art',
             formatted_address: '11 W 53rd St, New York, NY 10019, USA',
@@ -37,10 +43,10 @@
             latlng: {lat: 40.7485413, lng: -73.985757}
           },
           {
-            place_id: 'ChIJdwzvuv5YwokRxXayiC0JYHo',
-            name: 'Rockefeller Center',
-            formatted_address: 'Rockefeller Center, New York, NY, USA',
-            latlng: {lat: 40.7586101, lng: -73.9782093}
+            place_id: 'ChIJqaiomQBZwokRTHOaUG7fUTs',
+            name: 'New York Public Library - Stephen A. Schwarzman Building',
+            formatted_address: '476 5th Ave, New York, NY 10018, USA',
+            latlng: {lat: 40.7531823, lng: -73.982253}
           }
         ]
       };
@@ -181,17 +187,15 @@
       var contentString = '<div class="info-window">' +
                             '<div class="info-header">' +
                               '<h2 class="info-title" data-bind="text: placeName">' + '</h2>' +
-                              '<div class="info-address-container">'+'<div class="info-address" data-bind="text: placeAddress">' +'</div>'+'</div>' +
                               '<div class="info-nav">'+
                                 '<ul class="info-btns-list">'+
-                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'google\');}">' + 'google' + '</a>'+'</li>'+
+                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'google\');}, css: {"active", sourceType() === "google"}">' + 'google' + '</a>'+'</li>'+
                                   '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'flickr\');}">' + 'flickr' + '</a>'+'</li>'+
                                   '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'wiki\')}">' + 'wiki' + '</a>'+'</li>'+
                                 '</ul>'+
                               '</div>'+
                             '</div>' +
-
-                            '<div data-bind="html: contentString">'+'</div>'+
+                            '<div class="info-content" data-bind="html: contentString">'+'</div>'+
                           '</div>';
 
       // bounce marker
@@ -212,17 +216,18 @@
   function VMInfowindow() {
     var self = this;
     self.placeName = ko.observable();
-    self.placeAddress = ko.observable();
-    self.infos = ko.observableArray();
+    self.place_id = ko.observable();
+    self.sourceType = ko.observable();
+
     self.location = {
       lat: ko.observable(),
       lng: ko.observable()
     };
 
-    self.contentString = ko.observable('<h3>Hello, I\'m VMInfowindow</h3>');
+    self.contentString = ko.observable('');
     self.setPlace = function(marker){
       self.placeName(marker.name());
-      self.placeAddress(marker.formatted_address());
+      self.place_id(marker.id());
       self.location.lat(marker.location.lat());
       self.location.lng(marker.location.lng());
       // clear previous content
@@ -230,25 +235,87 @@
     };
 
     self.getMoreInfo = function(type) {
+      self.sourceType(type);
       switch(type) {
         case 'flickr':
           self.contentString('<div><img class="loading-icon" src="images/flickr-loader.gif" alt="loading"></div>');
           getInfoService.getFlickrInfo(populateFlickr, {name: self.placeName(),lat:self.location.lat(), lng:self.location.lng()});
           break;
         case 'wiki':
-          self.contentString('<div><img class="loading-icon" src="images/flickr-loader.gif" alt="loading"></div>');
+          self.contentString('<div><img class="loading-icon" src="images/ajax-loader.gif" alt="loading"></div>');
           getInfoService.getWikiInfo(populateWiki, {lat:self.location.lat(), lng:self.location.lng()});
+          break;
+        case 'google':
+          self.contentString('<div><img class="loading-icon" src="images/ajax-loader.gif" alt="loading"></div>');
+          googleMaps.placeService.getDetails({placeId: self.place_id()}, populateGoogle);
           break;
         default:
           console.log('unknow info type');
       }
     };
 
+    function populateGoogle(place, status) {
+      console.log(place);
+      var contentString = '';
+      if (status == google.maps.places.PlacesServiceStatus.OK) {
+          if(place.photos) {
+            var url = place.photos[0].getUrl({'maxWidth': 200});
+            contentString += '<div><img class="google-info-photo" src="'+url+'"></div>';
+          }
+          if(place.formatted_address){
+            contentString += formateGoogleInfoLine('marker', place.formatted_address);
+          }
+          if(place.geometry) {
+            console.log('('+place.geometry.location.lat()+', '+place.geometry.location.lng()+')');
+            contentString += formateGoogleInfoLine('location', '('+place.geometry.location.lat().toFixed(3)+', '+place.geometry.location.lng().toFixed(3)+')');
+          }
+          if(place.opening_hours) {
+
+            if(place.opening_hours.open_now) {
+              contentString += formateGoogleInfoLine('time', 'OPEN NOW');
+            } else {
+              contentString += formateGoogleInfoLine('time', 'NOT OPEN');
+            }
+          }
+          if(place.formatted_phone_number) {
+            contentString += formateGoogleInfoLine('phone', place.formatted_phone_number);
+          }
+          if(place.website) {
+            contentString += formateGoogleInfoLine('website', place.website);
+          }
+          contentString += '<footer class="additional-info-credit">' +
+                            'Results provided by <cite><a href="https://developers.google.com/maps/web/">Google Maps API</a></cite>.' +
+                            '</footer>';
+
+      } else {
+        contentString = '<div class="ajax-error">Something bad happended.</div>';
+      }
+
+      self.contentString(contentString);
+    }
+
+    function formateGoogleInfoLine(icon, text) {
+      var icons = {
+        'phone': '<i class="fa fa-phone" aria-hidden="true"></i>',
+        'time': '<i class="fa fa-clock-o" aria-hidden="true"></i>',
+        'marker': '<i class="fa fa-map-marker" aria-hidden="true"></i>',
+        'location': '<i class="fa fa-location-arrow" aria-hidden="true"></i>',
+        'website': '<i class="fa fa-globe" aria-hidden="true"></i>'
+      };
+
+      var contentString = '<div class="google-info-line">' +
+                      '<span class="google-info-icon">' +
+                        icons[icon] +
+                      '</span>' +
+                      '<span class="google-info-text">' + text +  '</span>' +
+                      '</div>';
+      return contentString;
+    }
     function populateFlickr(infos) {
       var contentString;
       if(!infos){
         // request failed
-        contentString = '<p>Something bad happended.</p>';
+        contentString = '<div class="ajax-error">Something bad happended.</div>';
       } else {
         contentString = infos.map(function(info) {
           // escape the title to prevent XSS attact
@@ -260,6 +327,9 @@
                     '</a>' +
                  '</div>';
         }).join('');
+        contentString += '<footer class="additional-info-credit">' +
+                          'Disclaimer: <q cite="https://www.flickr.com/services/api/tos/">This product uses the Flickr API but is not endorsed or certified by Flickr.</q>' +
+                          '</footer>';
       }
       self.contentString(contentString);
     }
@@ -269,36 +339,39 @@
       var contentString;
       if(!infos){
         // request failed
-        contentString = '<p>Something bad happended.</p>';
+        contentString = '<div class="ajax-error">Something bad happended.</div>';
       } else {
         contentString = infos.map(function(info) {
           // escape the title to prevent XSS attact
           var title = escapeHtml(info.title),
               description = escapeHtml(info.description);
           return '<div class="wiki-item">' +
-                    '<h2 class="wiki-item-header">' +
+                    '<h3 class="wiki-item-header">' +
 
                     (info.siteUrl ?
                       '<a target="_blank" href="' +info.siteUrl+ '"' + 'title="' + title + '">' +
                       title + '</a>' : title
                     ) +
 
-                    '</h2>' +
+                    '</h3>' +
 
                     (info.thumbnail ?
-                    '<img class="flickr-item-img" src="' + info.thumbnail.source + '" alt="' + title + '" >' : ''
+                    '<img class="wiki-item-img" src="' + info.thumbnail.source + '" alt="' + title + '" >' : ''
                     ) +
 
                     (info.description ?
-                    '<p>' + description + '</p>' : ''
+                    '<div class="wiki-item-description">' + description + '</div>' : ''
                     ) +
                  '</div>';
         }).join('');
+        contentString += '<footer class="additional-info-credit">' +
+                          'Results provided by <cite><a href="https://www.wikipedia.org/">Wikipedia</a></cite>.' +
+                          '</footer>';
       }
       self.contentString(contentString);
     }
     function clearContent() {
-      self.contentString('<h3>Hello, I\'m VMInfowindow</h3>');
+      self.contentString('');
     }
 
   }

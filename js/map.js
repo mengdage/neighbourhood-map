@@ -35,7 +35,7 @@
     });
 
     // style the infowindow when the dom is ready
-    infowindow.addListener('domready', styleInfowindow);
+    // infowindow.addListener('domready', styleInfowindow);
 
     // when map is clicked, close the infowindow if it is open
     map.addListener('click', function(){
@@ -237,22 +237,25 @@
         iwBgContent   = iwBackground.children(':nth-child(4)'),
         iwCloseBtn    = iwOuter.next(); //div that groups the close button elements.
 
+    // iwOuter.css({'top': '0', 'left': '0', 'width': '15rem !important'});
     // Removes background shadow DIV
     iwBgShadow.css({'display' : 'none'});
 
     // Removes white background DIV
-    iwBgContent.css({'display' : 'none'});
+    iwBgContent.css({'display': 'none'});
 
     // // Moves the infowindow.
-    // iwOuter.parent().parent().css({left: '100px'});
+    iwOuter.parent().css({'width': '15rem !important'});
     // // Moves the arrow.
     // iwArrowShadow.attr('style', function(i,s){ return s + 'left: 36px !important;'});
     // iwArrow.attr('style', function(i,s){ return s + 'left: 36px !important;'});
 
+  //   iwOuter.children(':nth-child(1)')
+  //           .css({'max-width': '15rem !important'});
     // Changes the desired tail shadow color.
     iwArrow.find('div').children()
            .css({'box-shadow': 'rgba(72, 181, 233, 0.6) 0px 1px 6px', 'z-index' : '1'});
-
+  //
     // Apply the desired effect to the close button
     iwCloseBtn.css({
       'width': '20px',
@@ -263,17 +266,17 @@
       'border': '4px solid #48b5e9',
       'border-radius': '13px',
       'box-shadow': '0 0 5px #3990B9'});
-
-    // If the content of infowindow not exceed the set maximum height, then the gradient is removed.
-    if($('.iw-content').height() < 140){
-      $('.iw-bottom-gradient').css({display: 'none'});
-    }
-
-    // The API automatically applies 0.7 opacity to the button after the mouseout event. This function reverses this event to the desired value.
-    iwCloseBtn.mouseout(function(){
-      $(this).css({opacity: '1'});
-    });
-  }
+  //
+  //   // If the content of infowindow not exceed the set maximum height, then the gradient is removed.
+  //   if($('.iw-content').height() < 140){
+  //     $('.iw-bottom-gradient').css({display: 'none'});
+  //   }
+  //
+  //   // The API automatically applies 0.7 opacity to the button after the mouseout event. This function reverses this event to the desired value.
+  //   iwCloseBtn.mouseout(function(){
+  //     $(this).css({opacity: '1'});
+  //   });
+   }
   /************ end of infowindow **************/
 
 
