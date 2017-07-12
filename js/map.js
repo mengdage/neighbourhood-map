@@ -9,7 +9,6 @@
   googleMaps.showMarkers = showMarkers;
   googleMaps.fitToAllMarkers = fitToAllMarkers;
   googleMaps.addMarkerClickListener = addMarkerClickListener;
-  googleMaps.addMapClickListener = addMapClickListener;
   googleMaps.openInfowindow = openInfowindow;
   googleMaps.setInfowindowContent = setInfowindowContent;
   googleMaps.setCenter = setCenter;
@@ -31,7 +30,7 @@
         highlighted: 'images/yellow-icon.png'
       };
 
-  global.addEventListener('load', init);
+  window.addEventListener('load', init);
 
   function init(){
     Marker = googleMaps.Marker;
@@ -50,20 +49,11 @@
       infowindow.close();
     });
 
+    // when map bounds changes, bias searchBox to the new map bounds
     map.addListener('bounds_changed', boundSearchboxToMap);
-
-
-
-
-    // map.addListener('bounds_changed', centerMap);
   }
   /************ Map  **************/
-
-  function addMapClickListener(cb) {
-    map.addListener(cb);
-  }
-
-  // center the map to the given marker or id
+  // center the map to the given marker, id or latlng
   // option must have marker, id, or latlng property
   function setCenter(option) {
     var marker, position;
@@ -76,9 +66,7 @@
     }
     // if marker exists, center map to the marker
     if(marker) {
-      console.log('center map to ' + marker.getPosition());
       map.panTo(marker.getPosition());
-      // bounceMarker({marker: marker});
     } else if(position) {
       map.panTo(position);
     }
@@ -117,9 +105,7 @@
     }
   }
 
-
   function boundSearchboxToMap() {
-    console.log('change searchBox bound');
     searchBox.setBounds(map.getBounds());
   }
 
@@ -128,7 +114,6 @@
   /************ Marker **************/
   // add marker to the array
   function addMarker(marker){
-    console.log('add Marker ' + marker.id() + " to the map");
     var m = new Marker({
         position: {lat: marker.location.lat(), lng: marker.location.lng()},
         map: map,
@@ -174,7 +159,6 @@
 
   // ids can be undefined, string('', 'xx'), array(length=0, length!=0)
   function showMarkers(ids) {
-    console.log(ids);
     if(!ids) {
       // if ids is undefined, or empty string
       // show all markers
@@ -223,7 +207,6 @@
     // If the marker with `id` exist and the type of icons is valid,
     // change the icon.
     if(marker && icons[type]) {
-      console.log('change marker to ' + type);
       marker.setIcon(icons[type]);
     }
   }

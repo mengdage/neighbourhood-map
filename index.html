@@ -13,24 +13,33 @@
 </head>
 <body>
   <main class="container">
+    <!-- the sidebar -->
     <section class="sidebar" data-bind="css: {expanded: expanded}">
+      <!-- the loading page -->
       <div class="app-loading" data-bind="css: {hide: hideLoading}">
         <img src="images/ajax-loader.gif">
       </div>
+
+      <!-- functional buttons -->
       <div class="side-btn-panel">
         <a class="btn-toggle" data-bind="click: toggleSidebar"></a>
         <a class="btn-global" data-bind="click: showAllMarkers"></a>
         <a class="btn-current" data-bind="click: fitCurrentLocation"></a>
       </div>
+
+      <!-- main content of the sidebar -->
       <div class="sidebar-content">
         <div class="sidebar-container">
           <h1 class="sidebar-header">Neighborhood Map</h1>
-          <div class="search-view" data-bind="css: {contracted: !expanded}">
+          <!-- search input -->
+          <div class="search-view">
             <input id="search-box" class="input-box" type="text" placeholder="add new places...">
           </div>
+          <!-- filter input -->
           <div class="filter-view">
             <input class="input-box" type="text" data-bind="textInput: filter" placeholder="search markered places...">
           </div>
+          <!-- marked places list -->
           <div class="list-view">
             <ol class="place-list" data-bind="foreach: filteredMarkers">
               <li class="place-item" data-bind="event: {mouseover: $parent.highlightMarker, mouseout: $parent.defaultMarker}">
@@ -43,6 +52,7 @@
         </div>
       </div>
     </section>
+    
     <section class="map-container">
       <div id="map"> </div>
     </section>

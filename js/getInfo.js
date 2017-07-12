@@ -17,12 +17,10 @@
 
     // check callback is a function
     if(typeof callback !== 'function') {
-      console.warn('callback is not a function');
       return;
     }
     // check place has been passed and has lat and lng
     if(!place || !place.lat || !place.lng) {
-      console.log(place);
       console.warn('Insufficient information. Make sure pass in a object with lat and lng as the second param');
       return;
     }
@@ -45,7 +43,6 @@
       dataType: 'json'
     })
       .done(function(data) {
-        console.log(data);
         var content,
             photos, // the photos array return from Flickr search api
             sourceUrl, // photo source url for one photo
