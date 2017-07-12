@@ -117,8 +117,8 @@
 
     self.expanded = ko.observable(true);
 
-    self.initializing = ko.observable(false);
-    
+    self.hideLoading = ko.observable(true);
+
 
     // cause to toogle expended class on sidebar
     self.toggleSidebar = function(){
@@ -147,7 +147,7 @@
 
     self.fitCurrentLocation = function() {
       if(navigator && navigator.geolocation) {
-        self.initializing(true);
+        self.hideLoading(false);
         navigator.geolocation.getCurrentPosition(function(position) {
           centerMap({
             latlng: {
@@ -155,7 +155,7 @@
               lng: position.coords.longitude
             }
           });
-        self.initializing(false);
+        self.hideLoading(true);
         });
       }
 

@@ -24,19 +24,18 @@ body {
   left: 0;
   width: 100vw;
   background: rgba(140, 140, 140, 0.5);
-  display: none;
   z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .app-loading img{
   display: block;
   width: 32px;
 }
-.show {
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.hide {
+  display: none;
 }
 
 .sidebar {
