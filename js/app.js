@@ -88,7 +88,6 @@
     // add click event listener to googleMap
 
     ko.applyBindings(vmSidebar, sidebarEle);
-    vmSidebar.initializing(false);
   }
 
   // Store the new marker
@@ -226,7 +225,6 @@
       var id = place.place_id,
           marker;
       if(self.findMarker(id) === -1) {
-        console.log(place.name+" "+id+" added.");
         marker = new MMarker(place);
         self.markers.push(marker);
         // Store the markers to the localStorage
@@ -282,9 +280,9 @@
                               '<h2 class="info-title" data-bind="text: placeName">' + '</h2>' +
                               '<div class="info-nav">'+
                                 '<ul class="info-btns-list">'+
-                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'google\');}, css: {"active", sourceType() === "google"}">' + 'google' + '</a>'+'</li>'+
-                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'flickr\');}">' + 'flickr' + '</a>'+'</li>'+
-                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'wiki\')}">' + 'wiki' + '</a>'+'</li>'+
+                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'google\');}, css: {active: sourceType() === \'google\'}">' + 'google' + '</a>'+'</li>'+
+                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'flickr\');}, css: {active: sourceType() === \'flickr\'">' + 'flickr' + '</a>'+'</li>'+
+                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'wiki\')}, css: {active: sourceType() === \'wiki\'">' + 'wiki' + '</a>'+'</li>'+
                                 '</ul>'+
                               '</div>'+
                             '</div>' +
@@ -304,7 +302,6 @@
 
     }
 
-
     window.addEventListener('resize', self.checkIfLargeWindow);
   }
 
@@ -313,7 +310,7 @@
     var self = this;
     self.placeName = ko.observable();
     self.place_id = ko.observable();
-    self.sourceType = ko.observable();
+    self.sourceType = ko.observable('');
 
     self.location = {
       lat: ko.observable(),
@@ -321,6 +318,7 @@
     };
 
     self.contentString = ko.observable('');
+    // Set the place where the infowindow is about
     self.setPlace = function(marker){
       self.placeName(marker.name());
       self.place_id(marker.id());
@@ -328,7 +326,7 @@
       self.location.lng(marker.location.lng());
       // clear previous content
       clearContent();
-      // self.getMoreInfo('google');
+      self.getMoreInfo('google');
     };
 
     self.getMoreInfo = function(type) {
