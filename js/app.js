@@ -3,6 +3,7 @@
 
   var googleMaps,
       window = global.window,
+      localStorage = window.localStorage,
       ko,
       searchBox,
       searchBoxElem = global.document.querySelector('#search-box'),
@@ -10,8 +11,8 @@
       vmSidebar,    // viewmodel
       sidebarEle = global.document.querySelector('.sidebar'),
       getInfo,
-      config = {
-        places: [
+      nm_config = {
+        nm_markers: [
           {
             place_id: 'ChIJmQJIxlVYwokRLgeuocVOGVU',
             name: 'Times Square',
@@ -52,6 +53,42 @@
       };
   global.addEventListener('load', init);
 
+  function init() {
+    // If the localStorage contain the nm_config,
+    // retrive the nm_config.places. If not, use
+    // the default nm_config.places.
+    var defaultPlaces;
+    if(localStorage.nm_markers) {
+      defaultPlaces = JSON.parse(localStorage.nm_markers);
+    } else {
+      defaultPlaces = nm_config.nm_markers;
+    }
+
+    // initialization
+    googleMaps = global.googleMaps;
+    ko = global.ko;
+    searchBox = googleMaps.searchBox;
+    getInfoService = global.getInfoService;
+
+
+    // create the sidebar viewmodel
+    vmSidebar = new VMSidebar();
+    vmSidebar.checkIfLargeWindow();
+
+    // create the infowindow viewmodel
+    vmInfowindow = new VMInfowindow();
+
+
+    // add default places
+    defaultPlaces.forEach(function(place) {
+      vmSidebar.addMarker(place);
+    });
+
+    // add click event listener to googleMap
+
+    ko.applyBindings(vmSidebar, sidebarEle);
+  }
+
   // Store the new marker
   function MMarker(place) {
     // TODO: create observable properties
@@ -83,6 +120,22 @@
       self.expanded(!self.expanded());
     };
 
+    // Store the markers to the localStorage.
+    self.storeMarkersToLocalStorage = function() {
+      var nm_markers = [];
+      self.markers().forEach(function(marker) {
+        nm_markers.push({
+          place_id: marker.id(),
+          name: marker.name(),
+          formatted_address: marker.formatted_address,
+          latlng: {lat: marker.location.lat(), lng: marker.location.lng()}
+        });
+      });
+
+      localStorage.nm_markers = JSON.stringify(nm_markers);
+    };
+
+    // fit the map to show all visible markers
     self.showAllMarkers = function() {
       googleMaps.fitToAllMarkers();
     };
@@ -155,8 +208,9 @@
         console.log(place.name+" "+id+" added.");
         marker = new MMarker(place);
         self.markers.push(marker);
+        // Store the markers to the localStorage
+        self.storeMarkersToLocalStorage();
         // Add a new marker on the google map
-        // TODO:
         googleMaps.addMarker(marker);
         googleMaps.addMarkerClickListener(id, function(){
           markerClickCallback(marker);});
@@ -182,6 +236,8 @@
       self.markers.remove(function(marker) {
         return marker.id() === id;
       });
+      // Store the markers to the localStorage
+      self.storeMarkersToLocalStorage();
       // Remove the marker from the google map markers
       googleMaps.removeMarker(place.id());
     };
@@ -401,31 +457,6 @@
       return div.innerHTML;
   }
 
-  function init() {
 
-    var defaultPlaces = config.places;
-    // initialization
-    googleMaps = global.googleMaps;
-    ko = global.ko;
-    searchBox = googleMaps.searchBox;
-    getInfoService = global.getInfoService;
-
-    // create the sidebar viewmodel
-    vmSidebar = new VMSidebar();
-    vmSidebar.checkIfLargeWindow();
-
-    // create the infowindow viewmodel
-    vmInfowindow = new VMInfowindow();
-
-
-    // add default places
-    defaultPlaces.forEach(function(place) {
-      vmSidebar.addMarker(place);
-    });
-
-    // add click event listener to googleMap
-
-    ko.applyBindings(vmSidebar, sidebarEle);
-  }
 }
 )(self);

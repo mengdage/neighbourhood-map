@@ -81,10 +81,13 @@
 
   }
 
+  // fit the map to show all visible markers
   function fitToAllMarkers() {
     var bounds = new LatLngBounds();
     markers.forEach(function(marker) {
-      bounds.extend(marker.getPosition());
+      if(marker.getMap()){
+        bounds.extend(marker.getPosition());
+      }
     });
     map.fitBounds(bounds);
   }

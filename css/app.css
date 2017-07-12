@@ -26,6 +26,7 @@ body {
   width: 0;
   z-index: 10;
   transition: width 0.2s ease-in-out;
+  height: 100%;
 }
 
 .sidebar-header {
@@ -36,11 +37,15 @@ body {
 
 .sidebar-content {
   overflow: hidden;
+  height: 100%;
 }
 
 .sidebar-container {
   padding: 10px;
+  height: 100%;
   width: 18rem;
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 .expanded {
@@ -138,6 +143,10 @@ body {
   display: inline-block;
   padding: 5px 0;
   width: 88%
+}
+
+.place-item-name:hover {
+  cursor: pointer;
 }
 
 .place-item-remove {
