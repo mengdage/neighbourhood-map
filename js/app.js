@@ -287,8 +287,8 @@
                               '<div class="info-nav">'+
                                 '<ul class="info-btns-list">'+
                                   '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'google\');}, css: {active: sourceType() === \'google\'}">' + 'google' + '</a>'+'</li>'+
-                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'flickr\');}, css: {active: sourceType() === \'flickr\'">' + 'flickr' + '</a>'+'</li>'+
-                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'wiki\')}, css: {active: sourceType() === \'wiki\'">' + 'wiki' + '</a>'+'</li>'+
+                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'flickr\');}, css: {active: sourceType() === \'flickr\'}">' + 'flickr' + '</a>'+'</li>'+
+                                  '<li>'+'<a href="#" data-bind="click: function(){getMoreInfo(\'wiki\')}, css: {active: sourceType() === \'wiki\'}">' + 'wiki' + '</a>'+'</li>'+
                                 '</ul>'+
                               '</div>'+
                             '</div>' +
