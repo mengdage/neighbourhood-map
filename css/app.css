@@ -86,7 +86,7 @@ body {
 }
 
 .search-view::before {
-  content: '\f002';
+  content: '\f067';
   font-family: FontAwesome;
   font-size: 1.2em;
   color: #f3f3f3;
@@ -96,7 +96,6 @@ body {
 }
 
 .contracted {
-  /*transform: translate(300px, -10px);*/
   display: fixed;
 }
 .input-box {
@@ -112,7 +111,7 @@ body {
   margin: 0 0 10px 0;
 }
 .filter-view::before {
-  content: '\f0b0';
+  content: '\f002';
   font-family: FontAwesome;
   font-size: 1.2em;
   color: #f3f3f3;
@@ -124,7 +123,6 @@ body {
 .list-view {
   margin: 0;
   color: #f3f3f3;
-  /*overflow-y: scroll;*/
 }
 
 .place-list {
@@ -137,6 +135,7 @@ body {
 .place-item {
   padding: 0;
   margin-bottom: 5px;
+  border-bottom: 1px solid #3a4b59;
 }
 
 .place-item-name {
