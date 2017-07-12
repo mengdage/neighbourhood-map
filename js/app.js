@@ -4,6 +4,7 @@
   var googleMaps,
       window = global.window,
       localStorage = window.localStorage,
+      navigator = window.navigator,
       ko,
       searchBox,
       searchBoxElem = global.document.querySelector('#search-box'),
@@ -87,6 +88,7 @@
     // add click event listener to googleMap
 
     ko.applyBindings(vmSidebar, sidebarEle);
+    vmSidebar.initializing(false);
   }
 
   // Store the new marker
@@ -115,6 +117,9 @@
 
     self.expanded = ko.observable(true);
 
+    self.initializing = ko.observable(false);
+    
+
     // cause to toogle expended class on sidebar
     self.toggleSidebar = function(){
       self.expanded(!self.expanded());
@@ -140,6 +145,22 @@
       googleMaps.fitToAllMarkers();
     };
 
+    self.fitCurrentLocation = function() {
+      if(navigator && navigator.geolocation) {
+        self.initializing(true);
+        navigator.geolocation.getCurrentPosition(function(position) {
+          centerMap({
+            latlng: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            }
+          });
+        self.initializing(false);
+        });
+      }
+
+    };
+
     // Set the self.largeWindow based on the window size
     self.checkIfLargeWindow = function() {
       if(window.innerWidth > 767) {
@@ -155,7 +176,7 @@
       if(!self.largeWindow()) {
         self.toggleSidebar();
       }
-      googleMaps.setCenter({id: id});
+      centerMap({id: id});
       googleMaps.triggerMarkerClick(id);
     };
 
@@ -251,6 +272,9 @@
       googleMaps.changeIcon(marker.id(), 'original');
     };
 
+    function centerMap(option) {
+      googleMaps.setCenter(option);
+    }
     function markerClickCallback(marker) {
       var id = marker.id();
       var contentString = '<div class="info-window">' +

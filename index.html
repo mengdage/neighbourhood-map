@@ -14,9 +14,13 @@
 <body>
   <main class="container">
     <section class="sidebar" data-bind="css: {expanded: expanded}">
+      <div class="app-loading" data-bind="css: {show: initializing}">
+        <img src="images/ajax-loader.gif">
+      </div>
       <div class="side-btn-panel">
         <a class="btn-toggle" data-bind="click: toggleSidebar"></a>
         <a class="btn-global" data-bind="click: showAllMarkers"></a>
+        <a class="btn-current" data-bind="click: fitCurrentLocation"></a>
       </div>
       <div class="sidebar-content">
         <div class="sidebar-container">

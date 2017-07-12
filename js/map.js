@@ -64,19 +64,23 @@
   }
 
   // center the map to the given marker or id
-  // option must have marker or id property
+  // option must have marker, id, or latlng property
   function setCenter(option) {
-    var marker;
+    var marker, position;
     if(option.marker) {
       marker = option.marker;
     } else if(option.id) {
       marker = findMarkerById(option.id);
+    } else if(option.latlng) {
+      position = option.latlng;
     }
     // if marker exists, center map to the marker
     if(marker) {
       console.log('center map to ' + marker.getPosition());
       map.panTo(marker.getPosition());
       // bounceMarker({marker: marker});
+    } else if(position) {
+      map.panTo(position);
     }
 
   }

@@ -17,6 +17,28 @@ body {
 }
 
 /************** sidebar ************/
+.app-loading {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: rgba(140, 140, 140, 0.5);
+  display: none;
+  z-index: 10000;
+}
+.app-loading img{
+  display: block;
+  width: 32px;
+}
+.show {
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .sidebar {
   background: #2e3d49;
   position: relative;
@@ -72,6 +94,17 @@ body {
 
 .btn-global::after {
   content: '\f0ac';
+  font-family: FontAwesome;
+  font-size: 1.5em;
+  background: #2e3d49;
+  padding: 5px;
+  color: #f3f3f3;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.btn-current::after {
+  content: '\f124';
   font-family: FontAwesome;
   font-size: 1.5em;
   background: #2e3d49;
