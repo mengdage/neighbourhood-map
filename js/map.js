@@ -99,9 +99,10 @@
     if(marker) {
       marker.setAnimation(google.maps.Animation.BOUNCE);
       window.setTimeout(end, duration * 1000);
-      function end() {
-        marker.setAnimation(null);
-      }
+    }
+    
+    function end() {
+      marker.setAnimation(null);
     }
   }
 

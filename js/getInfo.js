@@ -62,7 +62,7 @@
             farmId = photo.farm;
             serverId = photo.server;
             id = photo.id;
-            secret = photo.secret,
+            secret = photo.secret;
             owner = photo.owner;
             // construct a valid source URL to a photo
             // https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}_m.jpg
