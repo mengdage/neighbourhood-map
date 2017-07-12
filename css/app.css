@@ -47,11 +47,11 @@ body {
   width: 18rem;
 }
 
-.btn-toggle {
+.side-btn-panel {
   position: absolute;
   right: -1.9em;
-  top: 4px;
-  display: block;
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 .btn-toggle::after {
@@ -61,6 +61,18 @@ body {
   background: #2e3d49;
   padding: 5px;
   color: #f3f3f3;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.btn-global::after {
+  content: '\f0ac';
+  font-family: FontAwesome;
+  font-size: 1.5em;
+  background: #2e3d49;
+  padding: 5px;
+  color: #f3f3f3;
+  display: block;
 }
 
 .search-view {

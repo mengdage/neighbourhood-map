@@ -14,8 +14,10 @@
 <body>
   <main class="container">
     <section class="sidebar" data-bind="css: {expanded: expanded}">
-      <a class="btn-toggle" data-bind="click: toggleSidebar">
-      </a>
+      <div class="side-btn-panel">
+        <a class="btn-toggle" data-bind="click: toggleSidebar"></a>
+        <a class="btn-global" data-bind="click: showAllMarkers"></a>
+      </div>
       <div class="sidebar-content">
         <div class="sidebar-container">
           <h1 class="sidebar-header">Neighborhood Map</h1>

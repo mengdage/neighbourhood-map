@@ -7,6 +7,7 @@
   googleMaps.addMarker = addMarker;
   googleMaps.removeMarker = removeMarker;
   googleMaps.showMarkers = showMarkers;
+  googleMaps.fitToAllMarkers = fitToAllMarkers;
   googleMaps.addMarkerClickListener = addMarkerClickListener;
   googleMaps.addMapClickListener = addMapClickListener;
   googleMaps.openInfowindow = openInfowindow;
@@ -15,6 +16,7 @@
   googleMaps.bounceMarker = bounceMarker;
   googleMaps.triggerMarkerClick = triggerMarkerClick;
   googleMaps.changeIcon = changeIcon;
+
 
   var ko,
       window = global.window,
@@ -79,6 +81,14 @@
 
   }
 
+  function fitToAllMarkers() {
+    var bounds = new LatLngBounds();
+    markers.forEach(function(marker) {
+      bounds.extend(marker.getPosition());
+    });
+    map.fitBounds(bounds);
+  }
+
   // bounce the marker for 1second
   // options {id: id, marker: marker}
   function bounceMarker(options) {
@@ -100,13 +110,6 @@
     }
   }
 
-  function centerMap() {
-    var bounds = new LatLngBounds();
-    markers.forEach(function(marker) {
-      bounds.extend(marker.getPosition());
-    });
-    map.fitBounds(bounds);
-  }
 
   function boundSearchboxToMap() {
     console.log('change searchBox bound');
@@ -119,13 +122,12 @@
   // add marker to the array
   function addMarker(marker){
     console.log('add Marker ' + marker.id() + " to the map");
-
     var m = new Marker({
-      position: {lat: marker.location.lat(), lng: marker.location.lng()},
-      map: map,
-      icon: icons.original,
-      animation: google.maps.Animation.DROP
-    });
+        position: {lat: marker.location.lat(), lng: marker.location.lng()},
+        map: map,
+        icon: icons.original,
+        animation: google.maps.Animation.DROP
+      });
     m.id = marker.id();
     markers.push(m);
 

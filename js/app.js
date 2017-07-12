@@ -83,6 +83,10 @@
       self.expanded(!self.expanded());
     };
 
+    self.showAllMarkers = function() {
+      googleMaps.fitToAllMarkers();
+    };
+
     // Set the self.largeWindow based on the window size
     self.checkIfLargeWindow = function() {
       if(window.innerWidth > 767) {
@@ -244,7 +248,7 @@
       self.location.lng(marker.location.lng());
       // clear previous content
       clearContent();
-      self.getMoreInfo('google');
+      // self.getMoreInfo('google');
     };
 
     self.getMoreInfo = function(type) {
