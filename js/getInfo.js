@@ -6,7 +6,10 @@
     getWikiInfo: getWikiInfo
   };
 
-  // place: {lat: 123, lng: 123}
+  // Get resource from Flickr about the `place`(lat, lng).
+  // The `callback` is called with the result.
+  // If successful, the result will be an array of informations (title, sourceUrl, siteUrl);
+  // If failed, the result will be null.
   function getFlickrInfo(callback, place) {
     var endpoint = 'https://api.flickr.com/services/rest/',
         photoSourceUrl = 'https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}_m.jpg', // url to the photo
@@ -88,7 +91,11 @@
       });
   }
 
-  //
+  // Get resource from wikipedia bout the `place`(lat, lng).
+  // The `callback` is called with the result.
+  // If successful, the result will be an array of informations
+  // (siteUrl, thumbnail, title, description);
+  // If failed, the result will be null.
   function getWikiInfo(callback, place) {
     // check callback is a function
     if(typeof callback !== 'function') {
@@ -124,14 +131,11 @@
                   .map(function(page) {
                     return {
                       siteUrl: page.fullurl,
-                      coordinates: page.coordinates,
-                      lang: page.pagelanguage,
                       thumbnail: page.thumbnail,
                       title: page.title,
                       description: page.terms ? page.terms.description : undefined
                     };
                   });
-
       }
     })
     .always(function() {

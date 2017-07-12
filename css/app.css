@@ -163,24 +163,18 @@ body {
   display: flex;
   flex-flow: column nowrap;
   width: 15rem;
-  height: 25rem;
+  height: 22rem;
   overflow: scroll;
 }
 
 .info-header {
-  /*background-color: #48b5e9;*/
   padding: 5px 5px 0 5px;
-  /*color: #fff;*/
 }
 
 .info-title {
   text-align: center;
   margin: 0 0 10px 0;
 
-}
-
-.info-nav {
-  /*color: #fff;*/
 }
 
 .info-btns-list {

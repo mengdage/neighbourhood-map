@@ -27,7 +27,7 @@
           </div>
           <div class="list-view">
             <ol class="place-list" data-bind="foreach: filteredMarkers">
-              <li class="place-item">
+              <li class="place-item" data-bind="event: {mouseover: $parent.highlightMarker, mouseout: $parent.defaultMarker}">
                 <a class="place-item-name" data-bind="text: name, click: $parent.listItemClicked"></a>
                 <a class="place-item-remove" data-bind="click: $parent.removeMarker" >
                 </a>
@@ -57,13 +57,14 @@
         },
         backgroundColor: '#2e3d49'
       };
+      // create basic google maps objects and interfaces
       googleMaps.map = new google.maps.Map(document.getElementById('map'), options);
       googleMaps.infowindow = new google.maps.InfoWindow({maxWidth: 350});
       googleMaps.searchBox = new google.maps.places.SearchBox(document.getElementById('search-box'));
+      googleMaps.placeService = new google.maps.places.PlacesService(googleMaps.map);
       googleMaps.Marker = google.maps.Marker;
       googleMaps.LatLngBounds = google.maps.LatLngBounds;
       googleMaps.triggerEvent = google.maps.event.trigger;
-      googleMaps.placeService = new google.maps.places.PlacesService(googleMaps.map);
     }
   </script>
   <script async defer

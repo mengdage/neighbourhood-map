@@ -1,46 +1,55 @@
 (function(global){
   'use strict';
-  // Google Maps related functionalities
+  // object that includes Google Maps related functionalities
   var googleMaps = global.googleMaps || {};
+
   googleMaps.markers =[];
   googleMaps.addMarker = addMarker;
   googleMaps.removeMarker = removeMarker;
   googleMaps.showMarkers = showMarkers;
   googleMaps.addMarkerClickListener = addMarkerClickListener;
+  googleMaps.addMapClickListener = addMapClickListener;
   googleMaps.openInfowindow = openInfowindow;
   googleMaps.setInfowindowContent = setInfowindowContent;
   googleMaps.setCenter = setCenter;
   googleMaps.bounceMarker = bounceMarker;
   googleMaps.triggerMarkerClick = triggerMarkerClick;
+  googleMaps.changeIcon = changeIcon;
 
   var ko,
+      window = global.window,
       Marker,
       LatLngBounds,
+      searchBox,
       map,
       infowindow,
       markers = googleMaps.markers,
-      bounds;
+      icons = {
+        original: 'images/red-icon.png',
+        highlighted: 'images/yellow-icon.png'
+      };
 
   global.addEventListener('load', init);
+
   function init(){
     Marker = googleMaps.Marker;
     LatLngBounds = googleMaps.LatLngBounds;
+    searchBox = googleMaps.searchBox;
     map = googleMaps.map;
     infowindow = googleMaps.infowindow;
-    // bounds = new LatLngBounds();
 
     // when the infowindow is close, clear the associated marker
     infowindow.addListener('closeclick', function(){
       infowindow.marker = null;
     });
 
-    // style the infowindow when the dom is ready
-    // infowindow.addListener('domready', styleInfowindow);
-
     // when map is clicked, close the infowindow if it is open
     map.addListener('click', function(){
       infowindow.close();
     });
+
+    map.addListener('bounds_changed', boundSearchboxToMap);
+
 
 
 
@@ -48,7 +57,12 @@
   }
   /************ Map  **************/
 
-  // center the map to the given marker
+  function addMapClickListener(cb) {
+    map.addListener(cb);
+  }
+
+  // center the map to the given marker or id
+  // option must have marker or id property
   function setCenter(option) {
     var marker;
     if(option.marker) {
@@ -87,12 +101,16 @@
   }
 
   function centerMap() {
-    console.log('recenter the map');
     var bounds = new LatLngBounds();
     markers.forEach(function(marker) {
       bounds.extend(marker.getPosition());
     });
     map.fitBounds(bounds);
+  }
+
+  function boundSearchboxToMap() {
+    console.log('change searchBox bound');
+    searchBox.setBounds(map.getBounds());
   }
 
   /************ end of Map  **************/
@@ -105,6 +123,7 @@
     var m = new Marker({
       position: {lat: marker.location.lat(), lng: marker.location.lng()},
       map: map,
+      icon: icons.original,
       animation: google.maps.Animation.DROP
     });
     m.id = marker.id();
@@ -135,20 +154,11 @@
     });
   }
 
-  // hide the marker with id (place_id) but not remove
+  // hide the marker with id (place_id) but not remove it
   function hideMarker(id) {
     markers.forEach(function(marker) {
       if(marker.id === id) {
         marker.setMap(null);
-      }
-    });
-  }
-
-  // show the marker with id (place_id)
-  function showMarker(id) {
-    markers.forEach(function(marker) {
-      if(marker.id === id) {
-        marker.setMap(map);
       }
     });
   }
@@ -162,7 +172,7 @@
       markers.forEach(function(marker) {
         marker.setMap(map);
       });
-    } else {
+    } else { // show markers with `ids`
       if(typeof ids === 'string') {
         ids = [ids];
       }
@@ -190,16 +200,28 @@
     return null;
   }
 
+  // trigger the click event of the marker with `id`
   function triggerMarkerClick(id) {
     var marker = findMarkerById(id);
     if(marker){
       googleMaps.triggerEvent(marker, 'click');
     }
   }
+
+  // change the icon of the marker with `id`
+  function changeIcon(id, type) {
+    var marker = findMarkerById(id);
+    // If the marker with `id` exist and the type of icons is valid,
+    // change the icon.
+    if(marker && icons[type]) {
+      console.log('change marker to ' + type);
+      marker.setIcon(icons[type]);
+    }
+  }
   /************ end of Marker  **************/
 
   /************ infowindow **************/
-  // options must contain marker or id
+  // Options must contain marker or id
   function openInfowindow(options) {
     var marker;
     if(options.id){
@@ -213,70 +235,11 @@
 
     infowindow.open(map, marker);
   }
+
+  // Set the content of the infowindow
   function setInfowindowContent(content) {
     infowindow.setContent(content);
   }
-
-  // *
-  // START INFOWINDOW CUSTOMIZE.
-  // From Miguel Marnoto's codepen
-  // https://codepen.io/Marnoto/pen/xboPmG
-  // *
-  function styleInfowindow() {
-    // Reference to the DIV that wraps the bottom of infowindow
-    var iwOuter = $('.gm-style-iw');
-
-    /* Since this div is in a position prior to .gm-div style-iw.
-     * We use jQuery and create a iwBackground variable,
-     * and took advantage of the existing reference .gm-style-iw for the previous div with .prev().
-    */
-    var iwBackground  = iwOuter.prev(),
-        iwArrowShadow = iwBackground.children(':nth-child(1)'),
-        iwBgShadow    = iwBackground.children(':nth-child(2)'),
-        iwArrow       = iwBackground.children(':nth-child(3)'),
-        iwBgContent   = iwBackground.children(':nth-child(4)'),
-        iwCloseBtn    = iwOuter.next(); //div that groups the close button elements.
-
-    // iwOuter.css({'top': '0', 'left': '0', 'width': '15rem !important'});
-    // Removes background shadow DIV
-    iwBgShadow.css({'display' : 'none'});
-
-    // Removes white background DIV
-    iwBgContent.css({'display': 'none'});
-
-    // // Moves the infowindow.
-    iwOuter.parent().css({'width': '15rem !important'});
-    // // Moves the arrow.
-    // iwArrowShadow.attr('style', function(i,s){ return s + 'left: 36px !important;'});
-    // iwArrow.attr('style', function(i,s){ return s + 'left: 36px !important;'});
-
-  //   iwOuter.children(':nth-child(1)')
-  //           .css({'max-width': '15rem !important'});
-    // Changes the desired tail shadow color.
-    iwArrow.find('div').children()
-           .css({'box-shadow': 'rgba(72, 181, 233, 0.6) 0px 1px 6px', 'z-index' : '1'});
-  //
-    // Apply the desired effect to the close button
-    iwCloseBtn.css({
-      'width': '20px',
-      'height': '20px',
-      'opacity': '1',
-      'right': '44px',
-      'top': '8px',
-      'border': '4px solid #48b5e9',
-      'border-radius': '13px',
-      'box-shadow': '0 0 5px #3990B9'});
-  //
-  //   // If the content of infowindow not exceed the set maximum height, then the gradient is removed.
-  //   if($('.iw-content').height() < 140){
-  //     $('.iw-bottom-gradient').css({display: 'none'});
-  //   }
-  //
-  //   // The API automatically applies 0.7 opacity to the button after the mouseout event. This function reverses this event to the desired value.
-  //   iwCloseBtn.mouseout(function(){
-  //     $(this).css({opacity: '1'});
-  //   });
-   }
   /************ end of infowindow **************/
 
 

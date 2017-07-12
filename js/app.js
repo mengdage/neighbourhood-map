@@ -83,13 +83,12 @@
       self.expanded(!self.expanded());
     };
 
+    // Set the self.largeWindow based on the window size
     self.checkIfLargeWindow = function() {
       if(window.innerWidth > 767) {
         self.largeWindow(true);
-        console.log('large window');
       } else {
         self.largeWindow(false);
-        console.log('small window');
       }
     };
 
@@ -124,7 +123,7 @@
       googleMaps.showMarkers(ids);
     });
 
-    // add listener to places_changed event to get the search result
+    // Add listener to places_changed event to get the search result
     searchBox.addListener('places_changed', function() {
       // Clean searchBox
       searchBoxElem.value = '';
@@ -137,9 +136,10 @@
         return;
       }
 
-      places.forEach(function(place) {
-        self.addMarker(place);
-      });
+      // If there are multiple places, only add the first one,
+      // since this one is the closet one to our neighborhood.
+      self.addMarker(places[0]);
+
     });
 
     // add a new marker from the `place` and push the marker into the markers array
@@ -182,6 +182,15 @@
       googleMaps.removeMarker(place.id());
     };
 
+    // Highlight the marker by change the icon the highlited icon
+    self.highlightMarker = function(marker) {
+      googleMaps.changeIcon(marker.id(), 'highlighted');
+    };
+    // Default he marker by change the icon to the original icon
+    self.defaultMarker = function(marker) {
+      googleMaps.changeIcon(marker.id(), 'original');
+    };
+
     function markerClickCallback(marker) {
       var id = marker.id();
       var contentString = '<div class="info-window">' +
@@ -198,6 +207,8 @@
                             '<div class="info-content" data-bind="html: contentString">'+'</div>'+
                           '</div>';
 
+      // change the marker to original icon;
+      self.defaultMarker(marker);
       // bounce marker
       googleMaps.bounceMarker({id: id});
       // populate infowindow
@@ -208,6 +219,7 @@
       ko.applyBindings(vmInfowindow, document.querySelector('.info-window'));
 
     }
+
 
     window.addEventListener('resize', self.checkIfLargeWindow);
   }
@@ -232,9 +244,13 @@
       self.location.lng(marker.location.lng());
       // clear previous content
       clearContent();
+      self.getMoreInfo('google');
     };
 
     self.getMoreInfo = function(type) {
+      if(self.sourceType() === type) {
+        return;
+      }
       self.sourceType(type);
       switch(type) {
         case 'flickr':
@@ -255,7 +271,6 @@
     };
 
     function populateGoogle(place, status) {
-      console.log(place);
       var contentString = '';
       if (status == google.maps.places.PlacesServiceStatus.OK) {
           if(place.photos) {
