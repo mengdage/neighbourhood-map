@@ -1,0 +1,40 @@
+{
+  "places": [
+    {
+      "place_id":"ChIJmQJIxlVYwokRLgeuocVOGVU",
+      "name":"Times Square",
+      "formatted_address":"Manhattan,NY 10036, USA",
+      "latlng":{"lat":40.758895,"lng":-73.985131}
+    },
+    {
+      "place_id":"ChIJL7WWqfhYwokRrQkOaP3SOa4",
+      "name":"Sake Bar Hagi",
+      "formatted_address":"152 W 49th St, New York, NY 10019, USA",
+      "latlng":{"lat":40.7586101,"lng":-73.9782093}
+    },
+    {
+      "place_id":"ChIJKxDbe_lYwokRVf__s8CPn-o",
+      "name":"The Museum of Modern Art",
+      "formatted_address":"11 W 53rd St, New York, NY 10019, USA",
+      "latlng":{"lat":40.7614327,"lng":-73.977621}
+    },
+    {
+      "place_id":"ChIJvbGg56pZwokRp_E3JbivnLQ",
+      "name":"Bryant Park",
+      "formatted_address":"New York, NY 10018, USA",
+      "latlng":{"lat":40.7535965,"lng":-73.983232}
+    },
+    {
+      "place_id":"ChIJtcaxrqlZwokRfwmmibzPsTU",
+      "name":"Empire State Building",
+      "formatted_address":"Empire State Building, 350 5th Ave, New York, NY 10118, USA",
+      "latlng":{"lat":40.7485413,"lng":-73.985757}
+    },
+    {
+      "place_id":"ChIJqaiomQBZwokRTHOaUG7fUTs",
+      "name":"New York Public Library - Stephen A. Schwarzman Building",
+      "formatted_address":"476 5th Ave, New York, NY 10018, USA",
+      "latlng":{"lat":40.7531823,"lng":-73.982253}
+    }
+  ]
+}

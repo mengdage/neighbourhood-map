@@ -24,7 +24,7 @@
       console.warn('Insufficient information. Make sure pass in a object with lat and lng as the second param');
       return;
     }
-    var infos = null;
+    var infos;
     $.get({
       url: endpoint,
       data:{
@@ -83,6 +83,11 @@
           });
         }
       })
+      .fail(function(jqXHR, textStatus, error) {
+        console.error(textStatus);
+        // When failed, just set the result to null so that the callback is called with null
+        infos = null;
+      })
       .always(function(){
         callback(infos);
       });
@@ -100,7 +105,7 @@
       return;
     }
     var endPoint = 'https://en.wikipedia.org/w/api.php',
-        results = null;
+        results;
 
     $.ajax({
       url: endPoint,
@@ -134,6 +139,10 @@
                     };
                   });
       }
+    })
+    .fail(function() {
+      // When failed, just set the result to null so that the callback is called with null
+      results = null;
     })
     .always(function() {
       callback(results);

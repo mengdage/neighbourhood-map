@@ -7,84 +7,63 @@
       navigator = window.navigator,
       ko,
       searchBox,
-      searchBoxElem = global.document.querySelector('#search-box'),
       vmInfowindow, // viewmodel object
       vmSidebar,    // viewmodel object
       sidebarEle = global.document.querySelector('.sidebar'),
       // default configuration
-      nm_config = {
-        nm_markers: [
-          {
-            place_id: 'ChIJmQJIxlVYwokRLgeuocVOGVU',
-            name: 'Times Square',
-            formatted_address: 'Manhattan, NY 10036, USA',
-            latlng: {lat: 40.758895, lng: -73.985131}
-          },
-          {
-            place_id: 'ChIJL7WWqfhYwokRrQkOaP3SOa4',
-            name: 'Sake Bar Hagi',
-            formatted_address: '152 W 49th St, New York, NY 10019, USA',
-            latlng: {lat: 40.7586101, lng: -73.9782093}
-          },
-          {
-            place_id: 'ChIJKxDbe_lYwokRVf__s8CPn-o',
-            name: 'The Museum of Modern Art',
-            formatted_address: '11 W 53rd St, New York, NY 10019, USA',
-            latlng: {lat: 40.7614327, lng: -73.977621}
-          },
-          {
-            place_id: 'ChIJvbGg56pZwokRp_E3JbivnLQ',
-            name: 'Bryant Park',
-            formatted_address: 'New York, NY 10018, USA',
-            latlng: {lat: 40.7535965, lng: -73.983232}
-          },
-          {
-            place_id: 'ChIJtcaxrqlZwokRfwmmibzPsTU',
-            name: 'Empire State Building',
-            formatted_address: 'Empire State Building, 350 5th Ave, New York, NY 10118, USA',
-            latlng: {lat: 40.7485413, lng: -73.985757}
-          },
-          {
-            place_id: 'ChIJqaiomQBZwokRTHOaUG7fUTs',
-            name: 'New York Public Library - Stephen A. Schwarzman Building',
-            formatted_address: '476 5th Ave, New York, NY 10018, USA',
-            latlng: {lat: 40.7531823, lng: -73.982253}
-          }
-        ]
-      };
-  // initialization when window loaded
-  window.addEventListener('load', init);
+      nmConfigUrl = 'js/nm_config.json';
 
-  function init() {
-    // If the localStorage contain the nm_config,
-    // retrive the nm_config.places. If not, use
-    // the default nm_config.places.
-    var defaultPlaces;
-    if(localStorage.nm_markers) {
-      defaultPlaces = JSON.parse(localStorage.nm_markers);
-    } else {
-      defaultPlaces = nm_config.nm_markers;
+  global.appInit = appInit;
+  // // initialization when window loaded
+  // window.addEventListener('load', init);
+
+  // Initialize the app.
+  // The main tasks are
+  //  - instantiate viewmodels: vmSidebar, vmInfowindow
+  //  - bind the vmSidebar to the sidbar element
+  function appInit(status) {
+
+    ko = global.ko;
+
+    if(status === 'failure') {
+      vmSidebar = new VMSidebar(status);
+      ko.applyBindings(vmSidebar, sidebarEle);
+      return;
     }
+    var defaultPlaces;
 
     // initialization
     googleMaps = global.googleMaps;
-    ko = global.ko;
+
     searchBox = googleMaps.searchBox;
     getInfoService = global.getInfoService;
-
-
     // create the sidebar viewmodel
-    vmSidebar = new VMSidebar();
-    vmSidebar.checkIfLargeWindow();
-
+    vmSidebar = new VMSidebar(status);
     // create the infowindow viewmodel
     vmInfowindow = new VMInfowindow();
 
+    vmSidebar.checkIfLargeWindow();
 
-    // add default places
-    defaultPlaces.forEach(function(place) {
-      vmSidebar.addMarker(place);
-    });
+    // If the localStorage contain the nm_markers,
+    // retrive the nm_markers.
+    // If not, make a ajax request to retrive the nm_config.json,
+    // and add the default palces to the map.
+    if(localStorage.nm_markers) {
+      defaultPlaces = JSON.parse(localStorage.nm_markers);
+      defaultPlaces.forEach(function(place) {
+          vmSidebar.addMarker(place);
+      });
+    } else {
+      $.getJSON(nmConfigUrl)
+        .done(function(res) {
+          res.places.forEach(function(place) {
+            vmSidebar.addMarker(place);
+          });
+        })
+        .fail(function(err) {
+          throw err;
+        });
+    }
 
     // add click event listener to googleMap
     ko.applyBindings(vmSidebar, sidebarEle);
@@ -104,9 +83,10 @@
   }
 
   // Viewmodel for the sidebar
-  function VMSidebar() {
+  function VMSidebar(status) {
     var self = this;
 
+    self.status = ko.observable('');
     // The filter keyword
     self.filter = ko.observable('');
     // indicate if it's a large window (innerwidth > 767px)
@@ -114,7 +94,9 @@
     // indicate if the sidebar should be expanded
     self.expanded = ko.observable(true);
     // indicate if the loading page should be hide
-    self.hideLoading = ko.observable(true);
+    self.hideLoading = ko.observable(false);
+    // Words the user input to search for a place
+    self.searchInput = ko.observable('');
     // Store all the markers
     self.markers = ko.observableArray([]);
     // The result marker array filtered by `filter`
@@ -205,24 +187,8 @@
       googleMaps.showMarkers(ids);
     });
 
-    // Add listener to places_changed event to get the search result
-    searchBox.addListener('places_changed', function() {
-      // Clean searchBox
-      searchBoxElem.value = '';
-      // Check if small window. If so, close the sidebar
-      if(!self.largeWindow()) {
-        self.toggleSidebar();
-      }
-      var places = searchBox.getPlaces();
-      if( places.length === 0) {
-        return;
-      }
 
-      // If there are multiple places, only add the first one,
-      // since this one is the closet one to our neighborhood.
-      self.addMarker(places[0]);
 
-    });
 
     // add a new marker from the `place` and push the marker into the markers array
     self.addMarker = function (place) {
@@ -307,8 +273,33 @@
       ko.applyBindings(vmInfowindow, document.querySelector('.info-window'));
     }
 
-    // When the window size changes, check if the window is large
-    window.addEventListener('resize', self.checkIfLargeWindow);
+    if(status === 'failure') {
+      self.status(status);
+      // return self;
+    } else {
+      self.hideLoading(true);
+      // Add listener to places_changed event to get the search result
+      searchBox.addListener('places_changed', function() {
+        // Clean searchBox
+        self.searchInput('');
+        // Check if small window. If so, close the sidebar
+        if(!self.largeWindow()) {
+          self.toggleSidebar();
+        }
+        var places = searchBox.getPlaces();
+        if( places.length === 0) {
+          return;
+        }
+
+        // If there are multiple places, only add the first one,
+        // since this one is the closet one to our neighborhood.
+        self.addMarker(places[0]);
+
+      });
+      // When the window size changes, check if the window is large
+      window.addEventListener('resize', self.checkIfLargeWindow);
+    }
+
   }
 
   // Viewmodel for the infowindow
@@ -442,7 +433,7 @@
       } else {
         contentString = infos.map(function(info) {
           // escape the title to prevent XSS attact
-          var title = escapeHtml(info.title);
+          var title = escapeHTML(info.title);
           return '<div class="flickr-item">' +
                     '<h3 class="flickr-item-header">' + title + '</h3>' +
                     '<a target="_blank" href="' +info.siteUrl+ '"' + 'title="' + title + '">' +
@@ -468,8 +459,7 @@
       } else {
         contentString = infos.map(function(info) {
           // escape the title to prevent XSS attact
-          var title = escapeHtml(info.title),
-              description = escapeHtml(info.description);
+          var title = info.title ? escapeHTML(info.title) : '';
           return '<div class="wiki-item">' +
                     '<h3 class="wiki-item-header">' +
 
@@ -485,7 +475,7 @@
                     ) +
 
                     (info.description ?
-                    '<div class="wiki-item-description">' + description + '</div>' : ''
+                    '<div class="wiki-item-description">' + info.description + '</div>' : ''
                     ) +
                  '</div>';
         }).join('');
@@ -503,10 +493,18 @@
   }
 
   // escape text to prevent XSS
-  function escapeHtml(str) {
-      var div = document.createElement('div');
-      div.appendChild(document.createTextNode(str));
-      return div.innerHTML;
+  // Thanks to http://shebang.brandonmintern.com/foolproof-html-escaping-in-javascript/
+  var ESC_MAP = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  function escapeHTML(s, forAttribute) {
+      return s.replace(forAttribute ? /[&<>'"]/g : /[&<>]/g, function(c) {
+          return ESC_MAP[c];
+      });
   }
 
 

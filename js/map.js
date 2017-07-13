@@ -1,8 +1,11 @@
 (function(global){
   'use strict';
   // object that includes Google Maps related functionalities
-  var googleMaps = global.googleMaps || {};
+  var googleMaps = {};
 
+  global.googleMaps = googleMaps;
+  global.initMap = initMap;
+  global.mapError = mapError;
   googleMaps.markers =[];
   googleMaps.addMarker = addMarker;
   googleMaps.removeMarker = removeMarker;
@@ -15,6 +18,7 @@
   googleMaps.bounceMarker = bounceMarker;
   googleMaps.triggerMarkerClick = triggerMarkerClick;
   googleMaps.changeIcon = changeIcon;
+
 
 
   var ko,
@@ -30,9 +34,30 @@
         highlighted: 'images/yellow-icon.png'
       };
 
-  window.addEventListener('load', init);
+  // Callback function to be called when the Google Maps API loads successfully.
+  // If Google Maps API loads successfully, instantiate some objects
+  // and make references to some useful Google Maps APIs. Then call the appInit function with 'success'
+  function initMap(){
+    var options = {
+      center: {lat: 40.706539, lng: -74.019442},
+      zoom: 13,
+      disableDoubleClickZoom: false,
+      fullscreenControl: false,
+      mapTypeControl: true,
+      mapTypeControlOptions: {
+        position: google.maps.ControlPosition.BOTTOM_LEFT
+      },
+      backgroundColor: '#2e3d49'
+    };
+    // create basic google maps objects and interfaces
+    googleMaps.map = new google.maps.Map(document.getElementById('map'), options);
+    googleMaps.infowindow = new google.maps.InfoWindow({maxWidth: 350});
+    googleMaps.searchBox = new google.maps.places.SearchBox(document.getElementById('search-box'));
+    googleMaps.placeService = new google.maps.places.PlacesService(googleMaps.map);
+    googleMaps.Marker = google.maps.Marker;
+    googleMaps.LatLngBounds = google.maps.LatLngBounds;
+    googleMaps.triggerEvent = google.maps.event.trigger;
 
-  function init(){
     Marker = googleMaps.Marker;
     LatLngBounds = googleMaps.LatLngBounds;
     searchBox = googleMaps.searchBox;
@@ -51,7 +76,22 @@
 
     // when map bounds changes, bias searchBox to the new map bounds
     map.addListener('bounds_changed', boundSearchboxToMap);
+    // When user resizes the browser window, make sure all markers fit on screen.
+    google.maps.event.addDomListener(window, 'resize', function() {
+      fitToAllMarkers();
+    });
+
+
+    global.appInit('success');
   }
+
+  // Callback function to be called when the Google Maps API loads unsuccessfully.
+  // If Google Maps API loads unsuccessfully, simply call the appInit function with 'failure'
+  function mapError() {
+    global.appInit('failure');
+    console.error('Loading Google Maps API failed!');
+  }
+
   /************ Map  **************/
   // center the map to the given marker, id or latlng
   // option must have marker, id, or latlng property
@@ -100,7 +140,7 @@
       marker.setAnimation(google.maps.Animation.BOUNCE);
       window.setTimeout(end, duration * 1000);
     }
-    
+
     function end() {
       marker.setAnimation(null);
     }
