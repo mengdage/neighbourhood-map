@@ -18,9 +18,9 @@
       <!-- the loading page -->
       <div class="app-loading" data-bind="css: {hide: hideLoading}">
         <img src="images/ajax-loader.gif" alt="app loading page">
-        <div class="googlemap-error" data-bind="css: {show: status() === 'failure'}">
-          <p>Oops! Something went wrong.</p>
-          <p>This page didn't load Google Maps correctly.</p>
+        <div class="loading-msg" data-bind="css: {show: state() !== 'done'}">
+          <p class="loading-msg-info" data-bind="text: loadingInfoMsg"></p>
+          <p class="loading-msg-err" data-bind="text: loadingErrMsg"></p>
         </div>
       </div>
 
@@ -62,14 +62,14 @@
     </section>
   </main>
 
-  <script defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTASu4wSSGtlOvRn7rBiBxEl4RJr2Yreo&libraries=places&callback=initMap"
-    onerror="mapError()">
-  </script>
   <script src="libs/jquery-3.2.1.min.js"> </script>
   <script src="libs/knockout-3.4.2.js"> </script>
   <script src="js/getInfo.js"> </script>
   <script src="js/app.js"> </script>
   <script src="js/map.js"> </script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTASu4wSSGtlOvRn7rBiBxEl4RJr2Yreo&libraries=places&callback=initMap"
+    onerror="mapError()">
+  </script>
 </body>
 </html>

@@ -36,12 +36,16 @@ body {
   width: 32px;
 }
 
-.googlemap-error {
+.loading-msg {
   display: none;
   z-index: 100000;
   text-align: center;
   color: #fff;
   font-size: 1.5em;
+}
+
+.loading-msg-err {
+  color: #f00;
 }
 
 .hide {

@@ -23,25 +23,23 @@
   //  - bind the vmSidebar to the sidbar element
   function appInit(status) {
 
+    var defaultPlaces;
+
     ko = global.ko;
+    vmSidebar = new VMSidebar();
+    ko.applyBindings(vmSidebar, sidebarEle);
 
     if(status === 'failure') {
-      vmSidebar = new VMSidebar(status);
-      ko.applyBindings(vmSidebar, sidebarEle);
+      vmSidebar.setState('fail');
       return;
     }
-    var defaultPlaces;
 
     // initialization
     googleMaps = global.googleMaps;
-
     searchBox = googleMaps.searchBox;
     getInfoService = global.getInfoService;
-    // create the sidebar viewmodel
-    vmSidebar = new VMSidebar(status);
     // create the infowindow viewmodel
     vmInfowindow = new VMInfowindow();
-
     vmSidebar.checkIfLargeWindow();
 
     // If the localStorage contain the nm_markers,
@@ -50,23 +48,33 @@
     // and add the default palces to the map.
     if(localStorage.nm_markers) {
       defaultPlaces = JSON.parse(localStorage.nm_markers);
-      defaultPlaces.forEach(function(place) {
-          vmSidebar.addMarker(place);
-      });
+      loadDefaultPlaces(defaultPlaces, vmSidebar);
+
+      setTimeout(function(){vmSidebar.setState('done');}, 2000);
     } else {
       $.getJSON(nmConfigUrl)
         .done(function(res) {
-          res.places.forEach(function(place) {
-            vmSidebar.addMarker(place);
-          });
+          loadDefaultPlaces(res.places, vmSidebar);
+
         })
-        .fail(function(err) {
-          throw err;
+        .fail(function(jqXHR, textStatus, error) {
+          vmSidebar.setState('loadDefaultIssue');
+          console.error(textStatus);
+        })
+        .always(function(){
+
+          setTimeout(function(){vmSidebar.setState('done');}, 2000);
         });
     }
+  }
 
-    // add click event listener to googleMap
-    ko.applyBindings(vmSidebar, sidebarEle);
+  function loadDefaultPlaces(places, vmSidebar) {
+    if(places) {
+      places.forEach(function(place) {
+          vmSidebar.addMarker(place);
+      });
+      vmSidebar.setState('loadDefaultSuccess');
+    }
   }
 
   // Store the infomation of a marker
@@ -83,18 +91,22 @@
   }
 
   // Viewmodel for the sidebar
-  function VMSidebar(status) {
+  function VMSidebar() {
     var self = this;
 
-    self.status = ko.observable('');
+    self.state = ko.observable('pendding');
     // The filter keyword
     self.filter = ko.observable('');
     // indicate if it's a large window (innerwidth > 767px)
     self.largeWindow = ko.observable();
     // indicate if the sidebar should be expanded
     self.expanded = ko.observable(true);
-    // indicate if the loading page should be hide
+    // indicate if the loading page should be hidden
     self.hideLoading = ko.observable(false);
+    // The error message that is shown on the loading page
+    self.loadingErrMsg = ko.observable();
+    // The info message that is shown on the loading page
+    self.loadingInfoMsg = ko.observable();
     // Words the user input to search for a place
     self.searchInput = ko.observable('');
     // Store all the markers
@@ -111,6 +123,42 @@
         });
       }
     });
+    // set the state of the viewmodel
+    self.setState = function(state) {
+      if(state === 'fail') {
+        self.state(state);
+        self.loadingErrMsg('This page didn\'t load Google Maps correctly.');
+        // return self;
+      } else if (state === 'loadDefaultSuccess') {
+        self.loadingInfoMsg('The default places loaded correctly.');
+      } else if(state=== 'loadDefaultIssue') {
+        self.loadingErrMsg('The default places aren\'t loaded correctly.');
+      } else if(state === 'done') {
+        // Add listener to places_changed event to get the search result
+        searchBox.addListener('places_changed', function() {
+          // Clean searchBox
+          self.searchInput('');
+          // Check if small window. If so, close the sidebar
+          if(!self.largeWindow()) {
+            self.toggleSidebar();
+          }
+          var places = searchBox.getPlaces();
+          if( places.length === 0) {
+            return;
+          }
+
+          // If there are multiple places, only add the first one,
+          // since this one is the closet one to our neighborhood.
+          self.addMarker(places[0]);
+
+        });
+        // When the window size changes, check if the window is large
+        window.addEventListener('resize', self.checkIfLargeWindow);
+        self.hideLoading(true);
+        self.loadingErrMsg('');
+        self.loadingInfoMsg('');
+      }
+    };
 
     // cause to toogle "expanded" class on the sidebar
     self.toggleSidebar = function(){
@@ -140,6 +188,7 @@
     // Cause the map to center on the user's current location
     self.fitCurrentLocation = function() {
       if(navigator && navigator.geolocation) {
+        self.loadingInfoMsg('find current location...');
         self.hideLoading(false);
         navigator.geolocation.getCurrentPosition(function(position) {
           centerMap({
@@ -273,32 +322,6 @@
       ko.applyBindings(vmInfowindow, document.querySelector('.info-window'));
     }
 
-    if(status === 'failure') {
-      self.status(status);
-      // return self;
-    } else {
-      self.hideLoading(true);
-      // Add listener to places_changed event to get the search result
-      searchBox.addListener('places_changed', function() {
-        // Clean searchBox
-        self.searchInput('');
-        // Check if small window. If so, close the sidebar
-        if(!self.largeWindow()) {
-          self.toggleSidebar();
-        }
-        var places = searchBox.getPlaces();
-        if( places.length === 0) {
-          return;
-        }
-
-        // If there are multiple places, only add the first one,
-        // since this one is the closet one to our neighborhood.
-        self.addMarker(places[0]);
-
-      });
-      // When the window size changes, check if the window is large
-      window.addEventListener('resize', self.checkIfLargeWindow);
-    }
 
   }
 
