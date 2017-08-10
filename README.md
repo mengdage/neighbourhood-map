@@ -1,8 +1,12 @@
 # Neighborhood Map
 
+![NeighborhoodMap](wiki/images/NeighborhoodMap.jpg)
+
 This is a project of Udacity's Front-End Web Developer Nanodegree Program.
 
-You can open the app [here](https://mengdage.github.io/neighbourhood-map/).
+A single-page web application built with Knockout.js that features a map of a neighborhood by utilizing Google Maps API. Users can search, add, filter map markers. Third-party data from Flicker and Wikipedia are provided when markers are clicked.
+
+You can open the app [here](https://mengdage.github.io/neighbourhood-map/) :video_game:.
 
 ## Qucikstart
 
